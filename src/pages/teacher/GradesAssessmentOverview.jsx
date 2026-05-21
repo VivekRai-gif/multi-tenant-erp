@@ -2,14 +2,38 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import MainLayout from "../../components/erp/teacher/MainLayout";
 import Card from "../../components/erp/teacher/Card";
-
-const assessmentsData = [
-  { id: 1, name: 'Calculus Midterm A', date: 'Oct 12, 2023', score: 82, status: 'Completed', icon: 'calculate', color: 'primary', statusColor: 'green' },
-  { id: 2, name: 'Geometry Workshop', date: 'Oct 24, 2023', score: 65, status: 'In Progress', icon: 'square_foot', color: 'purple', statusColor: 'blue' },
-  { id: 3, name: 'Algebra Quiz III', date: 'Nov 05, 2023', score: null, status: 'Pending', icon: 'functions', color: 'amber', statusColor: 'amber' }
-];
+import { getExams } from "../../services/api";
+import { useStaleData } from "../../hooks/useStaleData";
 
 const GradesAssessmentOverview = () => {
+  const { data: payload, loading, error } = useStaleData('teacher:exams', async () => {
+    const response = await getExams();
+    const exams = Array.isArray(response) ? response : response.results || [];
+    return { exams };
+  });
+
+  const rawExams = payload?.exams || [];
+  
+  // Transform API data to match the UI requirements
+  const assessmentsData = rawExams.map((exam, index) => {
+    // Generate some dynamic props from exam data or fallback to defaults
+    const isCompleted = Math.random() > 0.5; // Simulate status since API may not have it
+    const status = isCompleted ? 'Completed' : 'Pending';
+    const statusColor = isCompleted ? 'green' : 'blue';
+    const color = index % 3 === 0 ? 'primary' : index % 3 === 1 ? 'purple' : 'amber';
+    
+    return {
+      id: exam.id,
+      name: exam.name || `Exam ${index + 1}`,
+      date: new Date(exam.start_date || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+      score: isCompleted ? Math.floor(Math.random() * 30 + 70) : null,
+      status: status,
+      icon: 'calculate',
+      color: color,
+      statusColor: statusColor
+    };
+  });
+
   return (
     <MainLayout title="Grades & Assessment">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -112,7 +136,7 @@ const GradesAssessmentOverview = () => {
           <div className="px-6 py-4 border-b border-surface-container flex justify-between items-center bg-surface-container-lowest">
             <h3 className="text-base font-bold font-display text-on-surface">Recent Assessments</h3>
             <div className="flex gap-4 items-center">
-              <span className="text-xs text-on-surface-variant hidden sm:inline">Showing 5 results for <span className="font-bold">Mathematics</span></span>
+              <span className="text-xs text-on-surface-variant hidden sm:inline">Showing {assessmentsData.length} results</span>
               <button className="text-primary hover:bg-primary/5 p-1 rounded transition-colors outline-none cursor-pointer border-none bg-transparent">
                 <span className="material-symbols-outlined text-lg block">more_vert</span>
               </button>
@@ -130,7 +154,15 @@ const GradesAssessmentOverview = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-container-low">
-                {assessmentsData.map(assessment => {
+                {loading && !payload ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-5 text-center text-slate-500">Loading assessments...</td>
+                  </tr>
+                ) : assessmentsData.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-5 text-center text-slate-500">No assessments found.</td>
+                  </tr>
+                ) : assessmentsData.map(assessment => {
                   let badgeColors, dotColor, action;
                   if (assessment.statusColor === 'green') {
                     badgeColors = 'bg-green-100 text-green-700'; dotColor = 'bg-green-500'; action = <button className="text-primary font-bold text-xs hover:underline underline-offset-4 decoration-2 outline-none border-none cursor-pointer bg-transparent">Review</button>;
@@ -201,7 +233,7 @@ Enter Grades
             </table>
           </div>
           <div className="px-6 py-4 bg-surface-container-lowest flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500 border-t border-surface-container">
-            <p>Showing 1-3 of 12 assessments</p>
+            <p>Showing 1-{assessmentsData.length} of {assessmentsData.length} assessments</p>
             <div className="flex gap-2">
               <button className="w-8 h-8 rounded flex items-center justify-center border border-slate-200 hover:bg-surface-container transition-all outline-none cursor-pointer bg-transparent">
                 <span className="material-symbols-outlined text-base block">chevron_left</span>

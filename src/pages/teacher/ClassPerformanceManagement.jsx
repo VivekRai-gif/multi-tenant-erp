@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import MainLayout from "../../components/erp/teacher/MainLayout";
 import Card from "../../components/erp/teacher/Card";
-import { getTeacherAssignment, getSectionEnrollments, getAttendanceRecords } from "../../services/api";
+import { getTeacherAssignment, getSectionEnrollments, getAttendanceRecords, getGrades } from "../../services/api";
 import { useStaleData } from "../../hooks/useStaleData";
 import { RevalidatingBar, SkeletonRow } from "../../components/erp/teacher/LoadingPrimitives";
 
@@ -25,14 +25,19 @@ const ClassPerformanceManagement = () => {
       const academicYearId = typeof assignmentData.academic_year === 'object'
         ? assignmentData.academic_year?.id
         : assignmentData.academic_year || assignmentData.academic_year_id;
+      const subjectId = typeof assignmentData.subject === 'object'
+        ? assignmentData.subject?.id
+        : assignmentData.subject || assignmentData.subject_id;
 
       let students = [];
       let attendanceMap = {};
+      let gradesMap = {};
 
       if (sectionId) {
-        const [enrollmentsData, attendanceData] = await Promise.all([
+        const [enrollmentsData, attendanceData, gradesData] = await Promise.all([
           getSectionEnrollments(sectionId, academicYearId),
           getAttendanceRecords(sectionId, academicYearId),
+          subjectId ? getGrades(subjectId) : Promise.resolve({ results: [] })
         ]);
 
         students = Array.isArray(enrollmentsData)
@@ -51,9 +56,22 @@ const ClassPerformanceManagement = () => {
             attendanceMap[sId].present += 1;
           }
         });
+
+        const grades = Array.isArray(gradesData)
+          ? gradesData
+          : gradesData.results || [];
+          
+        grades.forEach(grade => {
+          const sId = grade.student_id || grade.student;
+          // Only map the latest or highest? We can just keep the most recent or highest.
+          // Or just store the grade value
+          if (!gradesMap[sId] || parseFloat(grade.marks_obtained) > parseFloat(gradesMap[sId].marks_obtained)) {
+            gradesMap[sId] = grade;
+          }
+        });
       }
 
-      return { assignment: assignmentData, students, attendanceMap };
+      return { assignment: assignmentData, students, attendanceMap, gradesMap };
     },
     { skip: !id }
   );
@@ -61,6 +79,7 @@ const ClassPerformanceManagement = () => {
   const assignment = payload?.assignment ?? null;
   const students = payload?.students ?? [];
   const attendanceMap = payload?.attendanceMap ?? {};
+  const gradesMap = payload?.gradesMap ?? {};
 
   if (error && !payload) {
     return (
@@ -302,6 +321,7 @@ const ClassPerformanceManagement = () => {
                           const attPercentage = att && att.total > 0
                             ? Math.round((att.present / att.total) * 100)
                             : null;
+                          const grade = gradesMap[sId];
 
                           return (
                             <tr key={student.id} className="hover:bg-slate-50 transition-colors">
@@ -332,8 +352,8 @@ const ClassPerformanceManagement = () => {
                                 </div>
                               </td>
                               <td className="px-6 py-4">
-                                <span className="inline-flex px-2 py-1 rounded-md bg-slate-50 text-slate-700 border border-slate-200 text-xs font-bold">
-                                  N/A
+                                <span className={`inline-flex px-2 py-1 rounded-md text-xs font-bold ${grade ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-slate-50 text-slate-700 border border-slate-200'}`}>
+                                  {grade ? `${parseFloat(grade.marks_obtained).toFixed(1)} / ${parseFloat(grade.max_marks).toFixed(1)}` : 'N/A'}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-right">

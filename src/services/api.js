@@ -204,6 +204,30 @@ export const getAttendanceRecords = (sectionId, academicYearId, date) => {
   return fetchAllPages(endpoint);
 };
 
+/**
+ * Get grades
+ * GET /api/v1/operations/grades/
+ */
+export const getGrades = (subjectId) => {
+  let endpoint = "/api/v1/operations/grades/";
+  if (subjectId) {
+    endpoint += `?subject=${subjectId}`;
+  }
+  return fetchAllPages(endpoint);
+};
+
+/**
+ * Get all exams
+ * GET /api/v1/operations/exams/
+ */
+export const getExams = () => fetchAllPages("/api/v1/operations/exams/");
+
+/**
+ * Get a specific exam by ID
+ * GET /api/v1/operations/exams/<id>/
+ */
+export const getExam = (id) => apiCall(`/api/v1/operations/exams/${id}/`);
+
 export default {
   getMyProfile,
   getTeacherClasses,
@@ -212,5 +236,8 @@ export default {
   getStudentProfile,
   bulkRecordAttendance,
   getAttendanceRecords,
+  getGrades,
+  getExam,
+  getExams,
   API_BASE_URL,
 };
