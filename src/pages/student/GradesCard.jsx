@@ -77,7 +77,7 @@ export default function GradeCard() {
   // -------- Filtering  --------
   const filteredGrades = grades.filter((grade) => {
     const matchesSubject =
-      selectedSubject === "all" || grade.subect === selectedSubject;
+      selectedSubject === "all" || grade.subject === selectedSubject;
     const matchesExam = selectedExam === "all" || grade.exam === selectedExam;
     return matchesSubject && matchesExam;
   });
@@ -169,7 +169,7 @@ export default function GradeCard() {
               {/* Dynamic Subject Dropdown */}
               <select
                 value={selectedSubject}
-                onChange={(e) => selectedSubject(e.target.value)}
+                onChange={(e) => setSelectedSubject(e.target.value)}
                 className="bg-surface-container-low border-none rounded-md text-sm py-2 px-4 focus:ring-2 focus:ring-surface-tint"
               >
                 <option value="all">All Subjects</option>
