@@ -90,6 +90,12 @@ import GradesAssessmentOverview from "../pages/teacher/GradesAssessmentOverview"
 
 import ContentAIToolsDashboard from "../pages/teacher/ContentAIToolsDashboard";
 import AIToolWorkspaceLessonPlan from "../pages/teacher/AIToolWorkspaceLessonPlan";
+import AIToolWorkspaceWorksheet from "../pages/teacher/AIToolWorkspaceWorksheet";
+import AIToolWorkspaceQuiz from "../pages/teacher/AIToolWorkspaceQuiz";
+import AIToolWorkspaceQuestionPaper from "../pages/teacher/AIToolWorkspaceQuestionPaper";
+import AIToolWorkspaceStudyNotes from "../pages/teacher/AIToolWorkspaceStudyNotes";
+import AIToolWorkspacePresentationOutline from "../pages/teacher/AIToolWorkspacePresentationOutline";
+import AIToolWorkspaceRubric from "../pages/teacher/AIToolWorkspaceRubric";
 
 import StudentAnalyticsOverview from "../pages/teacher/StudentAnalyticsOverview";
 import DetailedStudentAnalytics from "../pages/teacher/DetailedStudentAnalytics";
@@ -347,6 +353,12 @@ return(
 
 <Route path="/teacher/ai-tools" element={<ContentAIToolsDashboard />} />
 <Route path="/teacher/ai-tools/lesson-plan" element={<AIToolWorkspaceLessonPlan />} />
+<Route path="/teacher/ai-tools/worksheet" element={<AIToolWorkspaceWorksheet />} />
+<Route path="/teacher/ai-tools/quiz" element={<AIToolWorkspaceQuiz />} />
+<Route path="/teacher/ai-tools/question-paper" element={<AIToolWorkspaceQuestionPaper />} />
+<Route path="/teacher/ai-tools/study-notes" element={<AIToolWorkspaceStudyNotes />} />
+<Route path="/teacher/ai-tools/presentation-outline" element={<AIToolWorkspacePresentationOutline />} />
+<Route path="/teacher/ai-tools/rubric" element={<AIToolWorkspaceRubric />} />
 
 <Route path="/teacher/analytics" element={<StudentAnalyticsOverview />} />
 <Route path="/teacher/analytics/student/:id" element={<DetailedStudentAnalytics />} />
