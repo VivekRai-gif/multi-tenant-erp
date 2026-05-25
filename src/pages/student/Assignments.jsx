@@ -11,7 +11,6 @@ export default function Assignments() {
   const [selectedAssignment, setSelectedAssignment] = useState(null); // For modal
   const [file, setFile] = useState(null);
   
-
   if (loading)
     return (
       <MainLayout>
@@ -240,7 +239,7 @@ export default function Assignments() {
               materials before your next assignment?
             </p>
             <div className="flex gap-4 mt-6">
-              <button className="bg-tertiary text-white px-6 py-2.5 rounded-md font-bold text-sm shadow-sm hover:opacity-90 transition-opacity">
+              <button className="bg-primary text-white px-6 py-2.5 rounded-md font-bold text-sm shadow-sm hover:opacity-90 transition-opacity">
                 Get Help Now
               </button>
               <button className="text-on-surface-variant px-6 py-2.5 rounded-md font-bold text-sm hover:bg-white/50 transition-colors">

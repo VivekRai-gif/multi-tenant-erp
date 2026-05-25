@@ -1,16 +1,11 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  children,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import {
   getStudentProfile,
   getStudentDashboardData,
   getStudentEnrollment,
   getStudentParents,
   getAcademicYear,
+  getAssignments,
   getSubmissions,
   getStudentAttendanceRecords,
 } from "../services/studentAPIs";
@@ -28,9 +23,9 @@ export const StudentProvider = ({ children }) => {
     submissions: [],
     attendanceRecords: [],
   });
-
   const [loading, setLoading] = useState(true);
 
+  // A method to refresh specific data (like submissions after upload)
   const refreshSubmissions = async () => {
     const subs = await getSubmissions();
     setContextData((prev) => ({ ...prev, submissions: subs }));
@@ -50,6 +45,8 @@ export const StudentProvider = ({ children }) => {
           enrollment,
           parentsData,
           academic,
+          assignments,
+          submissions,
           attendanceRecords,
         ] = await Promise.all([
           getStudentProfile(studentId),
@@ -57,6 +54,8 @@ export const StudentProvider = ({ children }) => {
           getStudentEnrollment(studentId),
           getStudentParents(),
           getAcademicYear(),
+          getAssignments(),
+          getSubmissions(),
           getStudentAttendanceRecords(studentId),
         ]);
 
@@ -66,12 +65,12 @@ export const StudentProvider = ({ children }) => {
           enrollment,
           parents: parentsData.filter((p) => p.student === studentId),
           academic,
-          assignments: [],
-          submissions: [],
+          assignments,
+          submissions,
           attendanceRecords,
         });
       } catch (err) {
-        console.error("Failed to load global student data.", err);
+        console.error("Failed to load global student data", err);
       } finally {
         setLoading(false);
       }
@@ -81,7 +80,8 @@ export const StudentProvider = ({ children }) => {
 
   return (
     <StudentContext.Provider
-      value={{ ...contextData, loading, refreshSubmissions }}>
+      value={{ ...contextData, loading, refreshSubmissions }}
+    >
       {children}
     </StudentContext.Provider>
   );
