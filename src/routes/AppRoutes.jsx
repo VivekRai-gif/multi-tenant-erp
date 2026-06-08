@@ -117,13 +117,14 @@ function RootRedirect() {
     } else if (userData.is_superuser) {
       mainRole = 'Global Admin';
     }
+
     const lowerRole = mainRole.toLowerCase();
     if (lowerRole.includes('global')) return <Navigate to="/global-admin" replace />;
     if (lowerRole.includes('school')) return <Navigate to="/school-admin" replace />;
     if (lowerRole.includes('teacher')) return <Navigate to="/teacher/dashboard" replace />;
     if (lowerRole.includes('student')) return <Navigate to="/student" replace />;
     if (lowerRole.includes('parent')) return <Navigate to="/parent" replace />;
-    // Fallback — something is in localStorage but role is unknown
+
     return <Navigate to="/student" replace />;
   } catch {
     return <Landing />;
@@ -177,91 +178,142 @@ function AppRoutes() {
 
         {/* ================= STUDENT ================= */}
         <Route path="/students" element={<Navigate to="/student" replace />} />
-        <Route path="/student" element={
-          <StudentProvider>
-            <StudentDashboard />
-          </StudentProvider>
-        } />
-        <Route path="/student/notifications" element={
-          <StudentProvider>
-            <Notifications />
-          </StudentProvider>
-        } />
-        <Route path="/student/assignments" element={
-          <StudentProvider>
-            <Assignments />
-          </StudentProvider>
-        } />
-        <Route path="/student/attendance" element={
-          <StudentProvider>
-            <Attendance />
-          </StudentProvider>
-        } />
-        <Route path="/student/fees" element={
-          <StudentProvider>
-            <FeesPayments />
-          </StudentProvider>
-        } />
-        <Route path="/student/help" element={
-          <StudentProvider>
-            <HelpDesk />
-          </StudentProvider>
-        } />
-        <Route path="/student/materials" element={
-          <StudentProvider>
-            <LearningMaterialsHub />
-          </StudentProvider>
-        } />
-        <Route path="/student/materials/view" element={
-          <StudentProvider>
-            <LearningMaterialDetailView />
-          </StudentProvider>
-        } />
-        <Route path="/student/quiz" element={
-          <StudentProvider>
-            <PracticeQuizHub />
-          </StudentProvider>
-        } />
-        <Route path="/student/quiz/active" element={
-          <StudentProvider>
-            <ActiveQuiz />
-          </StudentProvider>
-        } />
-        <Route path="/student/quiz/result" element={
-          <StudentProvider>
-            <QuizResult />
-          </StudentProvider>
-        } />
-        <Route path="/student/profile" element={
-          <StudentProvider>
-            <Profile />
-          </StudentProvider>
-        } />
-        <Route path="/student/subjects" element={
-          <StudentProvider>
-            <Subjects />
-          </StudentProvider>
-        } />
-        <Route path="/student/settings" element={
-          <StudentProvider>
-            <Settings />
-          </StudentProvider>
-        } />
-        <Route path="/student/recommendations" element={
-          <StudentProvider>
-            <Recommendations />
-          </StudentProvider>
-        } />
-        <Route path="/student/ai-tutor" element={
-          <StudentProvider>
-            <AiTutor />
-          </StudentProvider>
-        } />
-        <Route path="/student/grades" element={
-          <StudentProvider>
-            <GradesCard />
-          </StudentProvider>
-        } />
+        <Route
+          path="/student"
+          element={
+            <StudentProvider>
+              <StudentDashboard />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/notifications"
+          element={
+            <StudentProvider>
+              <Notifications />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/assignments"
+          element={
+            <StudentProvider>
+              <Assignments />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/attendance"
+          element={
+            <StudentProvider>
+              <Attendance />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/fees"
+          element={
+            <StudentProvider>
+              <FeesPayments />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/help"
+          element={
+            <StudentProvider>
+              <HelpDesk />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/materials"
+          element={
+            <StudentProvider>
+              <LearningMaterialsHub />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/materials/view"
+          element={
+            <StudentProvider>
+              <LearningMaterialDetailView />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/quiz"
+          element={
+            <StudentProvider>
+              <PracticeQuizHub />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/quiz/active"
+          element={
+            <StudentProvider>
+              <ActiveQuiz />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/quiz/result"
+          element={
+            <StudentProvider>
+              <QuizResult />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/profile"
+          element={
+            <StudentProvider>
+              <Profile />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/subjects"
+          element={
+            <StudentProvider>
+              <Subjects />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/settings"
+          element={
+            <StudentProvider>
+              <Settings />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/recommendations"
+          element={
+            <StudentProvider>
+              <Recommendations />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/ai-tutor"
+          element={
+            <StudentProvider>
+              <AiTutor />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/grades"
+          element={
+            <StudentProvider>
+              <GradesCard />
+            </StudentProvider>
+          }
+        />
 
         {/* ================= TEACHER ================= */}
         <Route path="/teacher" element={<Navigate to="/teacher/dashboard" />} />

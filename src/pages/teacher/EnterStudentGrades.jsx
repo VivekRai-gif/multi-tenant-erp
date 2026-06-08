@@ -223,17 +223,6 @@ const EnterStudentGrades = () => {
           </div>
         </div>
 
-        {/* Alerts */}
-        {error && (
-          <div className="p-4 bg-red-50 text-red-700 rounded-md border border-red-200 flex gap-3 shadow-sm">
-            <span className="material-symbols-outlined">error</span>
-            <div>
-              <p className="font-bold text-sm">Action Required</p>
-              <p className="text-sm mt-1">{error}</p>
-            </div>
-          </div>
-        )}
-
         {/* Bento Layout Content */}
         <div className="grid grid-cols-12 gap-8">
           {/* Main Grading Table */}
