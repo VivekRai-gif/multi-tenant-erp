@@ -22,11 +22,6 @@ export const getRecentActivity = async () => {
 };
 
 // --- Academic Years ---
-export const getAcademicYears = async () => {
-    const response = await apiClient.get('/academics/academic-years/');
-    return response.data;
-};
-
 export const getAcademicYearDetails = async (id) => {
     const response = await apiClient.get(`/academics/academic-years/${id}/`);
     return response.data;
@@ -79,31 +74,6 @@ export const getPermissions = async () => {
 };
 
 // --- Profiles & Academics ---
-export const getStudents = async () => {
-    const response = await apiClient.get('/profiles/students/');
-    return response.data;
-};
-
-export const getTeachers = async () => {
-    const response = await apiClient.get('/profiles/teachers/');
-    return response.data;
-};
-
-export const getParents = async () => {
-    const response = await apiClient.get('/profiles/parents/');
-    return response.data;
-};
-
-export const getParentStudentMappings = async () => {
-    const response = await apiClient.get('/profiles/parent-student-mappings/');
-    return response.data;
-};
-
-export const getTeacherAssignments = async () => {
-    const response = await apiClient.get('/academics/teacher-assignments/');
-    return response.data;
-};
-
 export const createClassLevel = async (data) => {
     const response = await apiClient.post('/academics/class-levels/', data);
     return response.data;
@@ -175,7 +145,6 @@ export const getStudentById = async (id) => {
     return response.data;
 };
 
-// Add these with your other API functions:
 export const getTeacherById = async (id) => {
     const response = await apiClient.get(`/profiles/teachers/${id}/`);
     return response.data;
@@ -221,6 +190,37 @@ export const updateSettings = async (data) => {
     return response.data;
 };
 
+// --- Paginated List Methods ---
+export const getStudents = async (page = 1) => {
+    const response = await apiClient.get(`/profiles/students/?page=${page}`);
+    return response.data;
+};
+
+export const getTeachers = async (page = 1) => {
+    const response = await apiClient.get(`/profiles/teachers/?page=${page}`);
+    return response.data;
+};
+
+export const getParents = async (page = 1) => {
+    const response = await apiClient.get(`/profiles/parents/?page=${page}`);
+    return response.data;
+};
+
+export const getParentStudentMappings = async (page = 1) => {
+    const response = await apiClient.get(`/profiles/parent-student-mappings/?page=${page}`);
+    return response.data;
+};
+
+export const getTeacherAssignments = async (page = 1) => {
+    const response = await apiClient.get(`/academics/teacher-assignments/?page=${page}`);
+    return response.data;
+};
+
+export const getAcademicYears = async (page = 1) => {
+    const response = await apiClient.get(`/academics/academic-years/?page=${page}`);
+    return response.data;
+};
+
 // --- Bundled Export ---
 export const schoolAdminApi = {
     getDashboardStats,
@@ -263,5 +263,7 @@ export const schoolAdminApi = {
     getTeacherAssignmentById,
     updateTeacherAssignment,
     deleteTeacherAssignment,
-    createSection
+    createSection,
+    getSettings,
+    updateSettings
 };

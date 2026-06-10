@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SchoolLayout from "../../components/erp/school/SchoolLayout";
 import { schoolAdminApi } from '../../services/schoolAdminApi';
 import ActionMenu from "./ActionMenu";
+import Pagination from "../../components/erp/global/Pagination";
 
 export default function Students() {
   const navigate = useNavigate();
@@ -11,25 +12,29 @@ export default function Students() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    fetchStudents(currentPage);
+  }, [currentPage]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (page) => {
     setLoading(true);
     setError(null);
     try {
-      // Clean, production-ready call
-      const data = await schoolAdminApi.getStudents();
+      // Pass the current page to the API
+      const data = await schoolAdminApi.getStudents(page);
       
-      // Handle DRF pagination structure
       if (data.results) {
         setStudents(data.results);
         setTotalCount(data.count);
+        // Assuming 10 items per page as per standard DRF pagination
+        setTotalPages(Math.ceil(data.count / 10));
       } else {
         setStudents(data);
         setTotalCount(data.length);
+        setTotalPages(1);
       }
     } catch (err) {
       console.error("Fetch Students Error:", err);
@@ -164,13 +169,13 @@ export default function Students() {
                       <td className="text-center">
                         {!s.is_archived ? (
                            <span className="px-3 py-1 bg-[#e5eeff] text-[#0058be] rounded-full text-xs font-semibold flex items-center gap-1 w-max mx-auto border border-blue-100">
-                             <span className="material-symbols-outlined text-[14px]">check_circle</span>
-                             Active
+                               <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                               Active
                            </span>
                         ) : (
                            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold flex items-center gap-1 w-max mx-auto border border-gray-200">
-                             <span className="material-symbols-outlined text-[14px]">archive</span>
-                             Archived
+                               <span className="material-symbols-outlined text-[14px]">archive</span>
+                               Archived
                            </span>
                         )}
                       </td>
@@ -185,24 +190,12 @@ export default function Students() {
             </table>
           </div>
 
-          {/* pagination */}
-          <div className="p-4 flex justify-between bg-gray-50 border-t border-gray-100 items-center">
-            <button className="text-[#0058be] flex gap-1 items-center text-sm font-semibold hover:bg-blue-50 px-3 py-1.5 rounded-md transition-colors">
-              <span className="material-symbols-outlined text-sm">arrow_back</span>
-              Previous
-            </button>
-
-            <div className="flex gap-1">
-              <button className="w-8 h-8 bg-[#0058be] text-white rounded-md text-sm font-semibold shadow-sm">
-                1
-              </button>
-            </div>
-
-            <button className="text-[#0058be] flex gap-1 items-center text-sm font-semibold hover:bg-blue-50 px-3 py-1.5 rounded-md transition-colors">
-              Next
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
-            </button>
-          </div>
+          {/* New Pagination Component */}
+          <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={(page) => setCurrentPage(page)} 
+          />
         </div>
 
         {/* analytics cards */}
@@ -239,7 +232,6 @@ export default function Students() {
           </div>
 
           <div className="relative">
-            {/* card */}
             <div className="bg-[#e7c6ad] p-8 rounded-2xl border border-[#d9b39a] h-full flex flex-col justify-center">
               <div className="w-12 h-12 rounded-xl bg-[#f2dfd0] flex items-center justify-center mb-4">
                 <span className="material-symbols-outlined text-[#9a4d00]">how_to_reg</span>
