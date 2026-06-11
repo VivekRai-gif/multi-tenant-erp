@@ -4,21 +4,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary:"#0058be",
-        "primary-container":"#2170e4",
-        background:"#f8f9ff",
-        "surface-container-low":"#eff4ff",
-        "surface-container-lowest":"#ffffff",
-        "surface-container-high":"#dce9ff",
-        "surface-container-highest":"#d3e4fe",
-        "on-surface":"#0b1c30",
-        "on-surface-variant":"#424754"
+        primary: "var(--color-primary)",
+        "primary-container": "var(--color-primary-container)",
+        "primary-fixed": "var(--color-primary-fixed)",
+        secondary: "var(--color-secondary)",
+        "secondary-fixed": "var(--color-secondary-fixed)",
+        tertiary: "var(--color-tertiary)",
+        "tertiary-fixed": "var(--color-tertiary-fixed)",
+        "on-tertiary-fixed-variant": "var(--color-on-tertiary-fixed-variant)",
+        background: "var(--color-background)",
+        surface: "var(--color-surface)",
+        "surface-container-low": "var(--color-surface-container-low)",
+        "surface-container-lowest": "var(--color-surface-container-lowest)",
+        "surface-container": "var(--color-surface-container)",
+        "surface-container-high": "var(--color-surface-container-high)",
+        "surface-container-highest": "var(--color-surface-container-highest)",
+        "surface-variant": "var(--color-surface-variant)",
+        "surface-tint": "var(--color-surface-tint)",
+        "on-surface": "var(--color-on-surface)",
+        "on-surface-variant": "var(--color-on-surface-variant)",
+        "on-background": "var(--color-on-background)",
+        "on-primary-container": "var(--color-on-primary-container)",
+        "on-primary-fixed": "var(--color-on-primary-fixed)",
+        outline: "var(--color-outline)",
+        "outline-variant": "var(--color-outline-variant)",
+        error: "var(--color-error)",
       },
-      fontFamily:{
-        headline:["Manrope"],
-        body:["Inter"]
-      }
-    }
+      fontFamily: {
+        headline: ["Manrope"],
+        body: ["Inter"],
+      },
+    },
   },
-  plugins:[]
-}
+  plugins: [],
+};

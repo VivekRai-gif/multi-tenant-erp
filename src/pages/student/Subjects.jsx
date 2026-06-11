@@ -53,7 +53,7 @@ useEffect(() => {
           <div className="flex items-center gap-3">
             <div className="flex flex-col gap-1">
               <label className="text-[10px] font-bold uppercase tracking-wider text-outline px-1">
-                Academic Year
+                {/* Academic Year */}
               </label>
               <select className="bg-surface-container-lowest border-none rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus:ring-primary">
                 {academicYears.map((data) => (
