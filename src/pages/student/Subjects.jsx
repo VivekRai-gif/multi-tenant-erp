@@ -78,42 +78,33 @@ export default function Subjects() {
         if (!enrollment?.section) return;
         const sectionData = await getSectionById(enrollment.section);
         setClassLevelId(sectionData.class_level);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) { console.error(error); }
     };
     fetchSection();
   }, [enrollment]);
 
   if (loading) return <SubjectsSkeleton />;
 
-  const subjects     = (academic?.subs || []).filter(s => s.class_levels?.includes(classLevelId));
-  const grades       = dashboard?.grades?.results || [];
+  const subjects      = (academic?.subs || []).filter(s => s.class_levels?.includes(classLevelId));
+  const grades        = dashboard?.grades?.results || [];
   const academicYears = academic?.years || [];
 
-  // ── Smart stats for blue box ──
-  const gradedSubjects = subjects.filter(s => grades.find(g => g.subject === s.id));
-
+  const gradedSubjects  = subjects.filter(s => grades.find(g => g.subject === s.id));
   const subjectsWithPct = gradedSubjects.map(s => {
-    const g   = grades.find(gr => gr.subject === s.id);
-    const pct = Math.round((g.marks_obtained / g.max_marks) * 100);
-    return { name: s.name, pct };
+    const g = grades.find(gr => gr.subject === s.id);
+    return { name: s.name, pct: Math.round((g.marks_obtained / g.max_marks) * 100) };
   });
-
-  const overallPct = subjectsWithPct.length > 0
-    ? Math.round(subjectsWithPct.reduce((sum, s) => sum + s.pct, 0) / subjectsWithPct.length)
-    : 0;
-
-  const topSubject  = subjectsWithPct.sort((a, b) => b.pct - a.pct)[0];
-  const weakSubject = [...subjectsWithPct].sort((a, b) => a.pct - b.pct)[0];
+  const overallPct     = subjectsWithPct.length > 0
+    ? Math.round(subjectsWithPct.reduce((sum, s) => sum + s.pct, 0) / subjectsWithPct.length) : 0;
+  const topSubject     = [...subjectsWithPct].sort((a, b) => b.pct - a.pct)[0];
+  const weakSubject    = [...subjectsWithPct].sort((a, b) => a.pct - b.pct)[0];
   const excellentCount = subjectsWithPct.filter(s => s.pct >= 80).length;
 
-  // Dynamic message based on overall %
   const getInsightMessage = () => {
-    if (overallPct >= 80) return "Outstanding! You're performing excellently across all subjects. Keep this momentum going!";
-    if (overallPct >= 65) return "Good progress! A little more focus on weaker subjects will push you to the top tier.";
-    if (overallPct >= 50) return "You're on the right track. Consistent study sessions can significantly improve your scores.";
-    return "There's room to grow! Consider reaching out to your teachers for extra support and guidance.";
+    if (overallPct >= 80) return "Outstanding! You're performing excellently across all subjects.";
+    if (overallPct >= 65) return "Good progress! Focus on weaker subjects to reach the top tier.";
+    if (overallPct >= 50) return "You're on the right track. Consistent study will improve your scores.";
+    return "There's room to grow! Reach out to your teachers for extra support.";
   };
 
   const getEmoji = () => {
@@ -140,6 +131,11 @@ export default function Subjects() {
               ))}
             </select>
           </div>
+          <select className="bg-surface-container-low border-none rounded-md px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-surface-tint outline-none w-full sm:w-auto">
+            {academicYears.map((data) => (
+              <option key={data.id}>{data.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Table */}
@@ -147,19 +143,18 @@ export default function Subjects() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-surface-container-low/50">
-                <th className="px-6 py-4 text-xs font-bold text-outline uppercase tracking-wider">Subject Name</th>
-                <th className="px-6 py-4 text-xs font-bold text-outline uppercase tracking-wider">Marks</th>
-                <th className="px-6 py-4 text-xs font-bold text-outline uppercase tracking-wider">
-                  Performance
-                  <span className="ml-1 text-[9px] normal-case font-medium text-outline/60 tracking-normal">(% of max marks)</span>
+                <th className="px-4 py-2.5 text-[10px] font-bold text-outline uppercase tracking-wider">Subject Name</th>
+                <th className="px-4 py-2.5 text-[10px] font-bold text-outline uppercase tracking-wider">Marks</th>
+                <th className="px-4 py-2.5 text-[10px] font-bold text-outline uppercase tracking-wider">
+                  Performance <span className="text-[9px] normal-case font-medium text-outline/60">(% of max)</span>
                 </th>
-                <th className="px-6 py-4 text-xs font-bold text-outline uppercase tracking-wider">Status</th>
+                <th className="px-4 py-2.5 text-[10px] font-bold text-outline uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-container-low">
               {subjects.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="px-6 py-10 text-center text-sm text-on-surface-variant">
+                  <td colSpan="4" className="px-4 py-6 text-center text-xs text-on-surface-variant">
                     No subjects found for your class.
                   </td>
                 </tr>
@@ -167,34 +162,35 @@ export default function Subjects() {
               {subjects.map((subject) => {
                 const gradeInfo  = grades.find(g => g.subject === subject.id);
                 const percentage = gradeInfo
-                  ? Math.round((gradeInfo.marks_obtained / gradeInfo.max_marks) * 100)
-                  : 0;
+                  ? Math.round((gradeInfo.marks_obtained / gradeInfo.max_marks) * 100) : 0;
                 const { barColor, label, labelColor } = getPerformanceMeta(percentage);
-
                 return (
                   <tr key={subject.id} className="hover:bg-surface-container-low/30 transition-colors">
-                    <td className="px-6 py-5">
-                      <p className="font-bold text-on-surface">{subject.name}</p>
-                      <p className="text-xs text-outline mt-0.5">{subject.code}</p>
+                    <td className="px-4 py-3">
+                      <p className="text-xs font-bold text-on-surface">{subject.name}</p>
+                      <p className="text-[10px] text-outline mt-0.5">{subject.code}</p>
                     </td>
-                    <td className="px-6 py-5 font-bold text-on-surface">
+                    <td className="px-4 py-3">
                       {gradeInfo
-                        ? <span>{gradeInfo.marks_obtained}<span className="text-outline font-normal text-xs"> / {gradeInfo.max_marks}</span></span>
-                        : <span className="text-outline font-normal text-sm">N/A</span>
+                        ? <span className="text-xs font-bold text-on-surface">
+                            {gradeInfo.marks_obtained}
+                            <span className="text-outline font-normal text-[10px]"> / {gradeInfo.max_marks}</span>
+                          </span>
+                        : <span className="text-[10px] text-outline">N/A</span>
                       }
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-32 h-2 bg-surface-container-high rounded-full overflow-hidden flex-shrink-0">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-surface-container-high rounded-full overflow-hidden flex-shrink-0">
                           <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${percentage}%` }} />
                         </div>
-                        <span className="text-xs font-semibold text-on-surface-variant w-8 flex-shrink-0">
+                        <span className="text-[10px] font-semibold text-on-surface-variant flex-shrink-0">
                           {gradeInfo ? `${percentage}%` : "—"}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-5">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold ${labelColor}`}>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${labelColor}`}>
                         {label}
                       </span>
                     </td>
@@ -222,29 +218,29 @@ export default function Subjects() {
               {/* Stats row */}
               <div className="flex flex-wrap gap-4 mt-2">
                 {topSubject && (
-                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-4 py-2.5 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">star</span>
+                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">star</span>
                     <div>
-                      <p className="text-[10px] opacity-75 uppercase tracking-wider font-bold">Top Subject</p>
-                      <p className="text-sm font-extrabold">{topSubject.name} — {topSubject.pct}%</p>
+                      <p className="text-[9px] opacity-75 uppercase tracking-wider font-bold">Top</p>
+                      <p className="text-[10px] font-extrabold">{topSubject.name} — {topSubject.pct}%</p>
                     </div>
                   </div>
                 )}
                 {weakSubject && weakSubject.pct < 65 && (
-                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-4 py-2.5 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">priority_high</span>
+                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">priority_high</span>
                     <div>
-                      <p className="text-[10px] opacity-75 uppercase tracking-wider font-bold">Focus On</p>
-                      <p className="text-sm font-extrabold">{weakSubject.name} — {weakSubject.pct}%</p>
+                      <p className="text-[9px] opacity-75 uppercase tracking-wider font-bold">Focus On</p>
+                      <p className="text-[10px] font-extrabold">{weakSubject.name} — {weakSubject.pct}%</p>
                     </div>
                   </div>
                 )}
                 {excellentCount > 0 && (
-                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-4 py-2.5 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">verified</span>
+                  <div className="bg-white/20 backdrop-blur-md rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">verified</span>
                     <div>
-                      <p className="text-[10px] opacity-75 uppercase tracking-wider font-bold">Excellent in</p>
-                      <p className="text-sm font-extrabold">{excellentCount} Subject{excellentCount > 1 ? "s" : ""}</p>
+                      <p className="text-[9px] opacity-75 uppercase tracking-wider font-bold">Excellent in</p>
+                      <p className="text-[10px] font-extrabold">{excellentCount} Subject{excellentCount > 1 ? "s" : ""}</p>
                     </div>
                   </div>
                 )}
@@ -256,7 +252,7 @@ export default function Subjects() {
                 View Detailed Analysis
               </button>
             </div>
-            <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+            <div className="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-3xl" />
           </div>
 
           {/* Upcoming tasks */}
@@ -268,7 +264,7 @@ export default function Subjects() {
                   <span className="material-symbols-outlined text-xl">lab_profile</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-on-surface">Physics Lab Report</p>
+                  <p className="text-[11px] font-bold text-on-surface">Physics Lab Report</p>
                   <p className="text-[10px] text-outline">Due in 2 days</p>
                 </div>
               </li>
@@ -277,7 +273,7 @@ export default function Subjects() {
                   <span className="material-symbols-outlined text-xl">history_edu</span>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-on-surface">Chem Quiz 4 Prep</p>
+                  <p className="text-[11px] font-bold text-on-surface">Chem Quiz 4 Prep</p>
                   <p className="text-[10px] text-outline">Due tomorrow</p>
                 </div>
               </li>
