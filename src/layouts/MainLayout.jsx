@@ -17,7 +17,7 @@ export default function MainLayout({ children, title }) {
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1280);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);

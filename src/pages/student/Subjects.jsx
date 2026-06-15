@@ -10,8 +10,8 @@ function Skeleton({ className = "" }) {
 function SubjectsSkeleton() {
   return (
     <MainLayout title="My Subjects">
-      <div className="px-8 py-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-8 gap-4">
           <div className="space-y-2">
             <Skeleton className="w-40 h-8" />
             <Skeleton className="w-64 h-4" />
@@ -130,11 +130,11 @@ export default function Subjects() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
-            <h2 className="text-3xl font-headline font-extrabold text-on-surface tracking-tight">My Subjects</h2>
+            <h2 className="text-2xl sm:text-3xl font-headline font-extrabold text-on-surface tracking-tight">My Subjects</h2>
             <p className="text-on-surface-variant mt-1 font-medium">Manage your academic curriculum and performance</p>
           </div>
           <div className="flex items-center gap-3">
-            <select className="bg-surface-container-lowest border-none rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus:ring-primary">
+            <select className="w-full sm:w-auto min-w-[180px] bg-surface-container-lowest border-none rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus:ring-primary">
               {academicYears.map((data) => (
                 <option key={data.id}>{data.name}</option>
               ))}
@@ -144,7 +144,8 @@ export default function Subjects() {
 
         {/* Table */}
         <div className="bg-surface-container-lowest rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
+           <div className="overflow-x-auto">
+          <table className="min-w-[700px] w-full text-left border-collapse">
             <thead>
               <tr className="bg-surface-container-low/50">
                 <th className="px-6 py-4 text-xs font-bold text-outline uppercase tracking-wider">Subject Name</th>
@@ -204,12 +205,13 @@ export default function Subjects() {
             </tbody>
           </table>
         </div>
+        </div>
 
         {/* Bottom cards */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* ── Dynamic Blue Box ── */}
-          <div className="md:col-span-2 bg-primary-container text-on-primary-container p-8 rounded-lg relative overflow-hidden flex flex-col justify-between min-h-[240px]">
+          <div className="lg:col-span-2 bg-primary-container text-on-primary-container p-8 rounded-lg relative overflow-hidden flex flex-col justify-between min-h-[240px]">
             <div className="relative z-10">
               <span className="material-symbols-outlined text-4xl mb-3">{getEmoji()}</span>
               <h3 className="text-2xl font-headline font-extrabold leading-tight mb-2">
@@ -220,7 +222,7 @@ export default function Subjects() {
               </p>
 
               {/* Stats row */}
-              <div className="flex flex-wrap gap-4 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                 {topSubject && (
                   <div className="bg-white/20 backdrop-blur-md rounded-lg px-4 py-2.5 flex items-center gap-2">
                     <span className="material-symbols-outlined text-base">star</span>

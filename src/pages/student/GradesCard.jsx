@@ -25,7 +25,7 @@ function GradeCardSkeleton() {
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm">
-          <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <Skeleton className="w-48 h-6" />
             <div className="flex gap-3">
               <Skeleton className="w-32 h-9 rounded-md" />
@@ -307,20 +307,42 @@ export default function GradeCard() {
         <div className="bg-surface-container-lowest rounded-xl shadow-sm">
           <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h3 className="text-xl font-headline font-bold text-on-surface">Subject-wise Breakdown</h3>
-            <div className="flex items-center gap-3">
-              <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}
-                className="bg-surface-container-low border-none rounded-md text-sm py-2 px-4 focus:ring-2 focus:ring-surface-tint">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+
+              <select
+                value={selectedSubject}
+                onChange={(e) => setSelectedSubject(e.target.value)}
+                className="w-full sm:w-48 bg-surface-container-low border-none rounded-md text-sm py-2 px-4 focus:ring-2 focus:ring-surface-tint"
+              >
                 <option value="all">All Subjects</option>
-                {subjects.map((sub) => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
+                {subjects.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                     {sub.name}
+                  </option>
+                ))}
               </select>
-              <select value={selectedExam} onChange={(e) => setSelectedExam(e.target.value)}
-                className="bg-surface-container-low border-none rounded-md text-sm py-2 px-4 focus:ring-2 focus:ring-surface-container-lowest">
+
+              <select
+                 value={selectedExam}
+                 onChange={(e) => setSelectedExam(e.target.value)}
+                 className="w-full sm:w-48 bg-surface-container-low border-none rounded-md text-sm py-2 px-4 focus:ring-2 focus:ring-surface-container-lowest"
+              >
                 <option value="all">All Exams</option>
-                {exams.map((exam) => <option key={exam.id} value={exam.id}>{exam.name}</option>)}
+                {exams.map((exam) => (
+                  <option key={exam.id} value={exam.id}>
+                    {exam.name}
+                  </option>
+                ))}
               </select>
-              <button className="w-10 h-10 flex items-center justify-center rounded-md bg-surface-container-low hover:bg-surface-container-high transition-colors">
-                <span className="material-symbols-outlined text-on-surface-variant">filter_list</span>
+
+              <button
+                className="h-10 sm:w-10 w-full flex items-center justify-center rounded-md bg-surface-container-low hover:bg-surface-container-high transition-colors"
+              >
+                <span className="material-symbols-outlined text-on-surface-variant">
+                   filter_list
+                </span>
               </button>
+
             </div>
           </div>
 
