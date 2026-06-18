@@ -219,7 +219,7 @@ function NotifCard({ notif, studentName, isUnread, onRead, onDismiss }) {
         <div className="flex items-start justify-between gap-2 mb-0.5">
           <h3 className="text-xs font-bold text-on-surface leading-tight">{notif.title}</h3>
           <div className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-2xs text-on-surface-variant uppercase font-medium">{notif.time}</span>
+            <span className="text-[10px] text-on-surface-variant uppercase font-medium">{notif.time}</span>
             {isUnread && <span className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />}
           </div>
         </div>
@@ -308,8 +308,8 @@ export default function NotificationsHub() {
         {/* ── Header ── */}
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-base font-bold font-headline text-on-surface">Notifications</h1>
-            <p className="text-xs text-on-surface-variant mt-0.5">
+            <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+            <p className="text-gray-500 mt-1">
               Stay updated with {studentName}&apos;s latest academic progress and school alerts.
             </p>
           </div>
@@ -344,7 +344,7 @@ export default function NotificationsHub() {
                 >
                   {label}
                   {count > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-3xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                       {count}
                     </span>
                   )}

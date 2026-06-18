@@ -76,6 +76,14 @@ export default function AssignmentsOverview() {
   const [subjectFilter, setSubjectFilter] = useState("All Subjects");
   const [statusFilter, setStatusFilter] = useState("All Status");
 
+  // ── Hooks must run unconditionally, on every render, before any early return ──
+  const list = assignments || [];
+
+  const subjectOptions = useMemo(
+    () => ["All Subjects", ...Array.from(new Set(list.map(a => a.subject_name).filter(Boolean)))],
+    [list]
+  );
+
   if (loading) return <AssignmentsSkeleton />;
 
   if (error || !profile) {
@@ -91,12 +99,6 @@ export default function AssignmentsOverview() {
   }
 
   const studentFirstName = profile?.first_name || "your child";
-  const list = assignments || [];
-
-  const subjectOptions = useMemo(
-    () => ["All Subjects", ...Array.from(new Set(list.map(a => a.subject_name).filter(Boolean)))],
-    [list]
-  );
 
   const total = list.length;
   const submittedCount = list.filter(a => a.submission_status === "Submitted" || a.submission_status === "Graded").length;
