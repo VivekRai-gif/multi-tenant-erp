@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import DashboardLayout from "../../components/erp/parent/DashboardLayout";
+import { parentData } from "../../services/parentAPIs";
 
 const Toggle = ({ enabled, onToggle }) => (
   <button
@@ -126,12 +127,32 @@ const ParentPortalSettings = () => {
   const [notifs, setNotifs]           = useState({ email: true, push: true, sms: false });
   const [saved, setSaved]             = useState(false);
   const [countryCode, setCountryCode] = useState("+91");
-  const [phone, setPhone]             = useState("5550123456");
+  const [phone, setPhone] = useState();
+  const [name, setName] = useState();
+  const [email, setEmail] = useState()
 
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
+
+  // Fetch Parent Dynamic Data
+    setTimeout(() => {
+      async function gerParentData(){
+        try {
+          const userData = JSON.parse(localStorage.getItem("user_data"));
+          const parentId = userData?.profiles?.parent?.id
+          const parentStats = await parentData(parentId);
+          setName(parentStats.first_name[0].toUpperCase() + parentStats.first_name.slice(1) + " " + parentStats.last_name[0].toUpperCase() + parentStats.last_name.slice(1))
+          setEmail(parentStats.email)
+          setPhone(parentStats.phone_number)
+
+        } catch(err){
+            console.error("couldn't fetch parent data", err)
+          }
+      }
+      gerParentData();
+    }, 1000);
 
   const inputCls =
     "w-full rounded-lg px-3 py-2 text-xs border-none outline-none " +
@@ -142,20 +163,20 @@ const ParentPortalSettings = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-3 sm:p-5 md:p-5 max-w-7xl mx-auto flex flex-col gap-3 sm:gap-4">
+      <div className="p-3 sm:p-5 max-w-7xl mx-auto flex flex-col gap-3 sm:gap-4">
 
         {/* ── Header ── */}
         <div>
-          <h1 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">Settings</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-white">Settings</h1>
           <p className="text-xs text-slate-500 dark:text-slate-300 mt-0.5">
             Manage your account preferences and configuration.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-4">
 
           {/* ── Account Profile ── */}
-          <section className="lg:col-span-7 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 flex flex-col transition-colors duration-300">
+          <section className="xl:col-span-7 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 flex flex-col transition-colors duration-300">
 
             <div className="flex items-center gap-2 mb-3">
               <span className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg material-symbols-outlined text-base">person</span>
@@ -168,13 +189,13 @@ const ParentPortalSettings = () => {
               {/* Full Name */}
               <div className="space-y-1">
                 <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Full Name</label>
-                <input type="text" defaultValue="Alex Harrison" className={inputCls} />
+                <input type="text" defaultValue={name} className={inputCls} />
               </div>
 
               {/* Email */}
               <div className="space-y-1">
                 <label className="text-[10px] font-semibold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Email Address</label>
-                <input type="email" defaultValue="alex.harrison@edu-mail.com" className={inputCls} />
+                <input type="email" defaultValue={email} className={inputCls} />
               </div>
 
               {/* Phone with country code */}
@@ -202,7 +223,7 @@ const ParentPortalSettings = () => {
                       className={`${inputCls} pr-10`}
                     />
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-300 pointer-events-none whitespace-nowrap">
-                      {phone.length}/{COUNTRY_CODES.find((c) => c.code === countryCode)?.maxDigits || 10}
+                      {phone && phone.length}/{COUNTRY_CODES.find((c) => c.code === countryCode)?.maxDigits || 10}
                     </span>
                   </div>
                 </div>
@@ -231,7 +252,7 @@ const ParentPortalSettings = () => {
           </section>
 
           {/* ── Right column ── */}
-          <div className="lg:col-span-5 flex flex-col gap-3 sm:gap-4">
+          <div className="xl:col-span-5 flex flex-col gap-3 sm:gap-4">
 
             {/* Language & Appearance */}
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 flex flex-col gap-3 transition-colors duration-300">
@@ -287,7 +308,7 @@ const ParentPortalSettings = () => {
             </div>
 
             {/* AI Configuration */}
-            <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-3 sm:p-4 border-l-4 border-amber-500 flex items-center justify-between gap-3 transition-colors duration-300">
+            <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-3 sm:p-4 border-l-4 border-amber-500 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors duration-300">
               <div className="flex items-start gap-2 min-w-0">
                 <span className="material-symbols-outlined text-amber-600 dark:text-amber-300 text-base mt-0.5 flex-shrink-0">auto_awesome</span>
                 <div className="min-w-0">
@@ -297,13 +318,13 @@ const ParentPortalSettings = () => {
                   </p>
                 </div>
               </div>
-              <button className="flex-shrink-0 bg-amber-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">
+              <button className="flex-shrink-0 w-full sm:w-auto bg-amber-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity whitespace-nowrap">
                 Manage →
               </button>
             </div>
 
             {/* Account Security */}
-            <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-3 sm:p-4 flex items-center justify-between gap-3 transition-colors duration-300">
+            <div className="bg-red-50 dark:bg-red-950/20 rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors duration-300">
               <div className="flex items-start gap-2 min-w-0">
                 <span className="material-symbols-outlined text-red-500 dark:text-red-300 text-base mt-0.5 flex-shrink-0">warning</span>
                 <div className="min-w-0">
@@ -313,19 +334,19 @@ const ParentPortalSettings = () => {
                   </p>
                 </div>
               </div>
-              <button className="flex-shrink-0 bg-red-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-600 transition-colors whitespace-nowrap">
+              <button className="flex-shrink-0 w-full sm:w-auto bg-red-500 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-600 transition-colors whitespace-nowrap">
                 Sign Out All
               </button>
             </div>
           </div>
 
           {/* ── Notifications ── */}
-          <section className="lg:col-span-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors duration-300">
+          <section className="xl:col-span-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 transition-colors duration-300">
             <div className="flex items-center gap-2 mb-3">
               <span className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 rounded-lg material-symbols-outlined text-base">notifications_active</span>
               <h2 className="text-sm font-bold text-slate-800 dark:text-white">Notification Preferences</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3">
               {[
                 { key: "email", icon: "mail",      label: "Email Summaries",    desc: "Weekly digests of child progress"   },
                 { key: "push",  icon: "smartphone", label: "Push Notifications", desc: "Real-time alerts for absences"      },
