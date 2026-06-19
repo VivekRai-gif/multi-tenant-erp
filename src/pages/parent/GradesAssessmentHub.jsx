@@ -4,39 +4,39 @@ import { useParent } from "../../context/ParentProvider";
 
 /* ─── Skeleton ─────────────────────────────────────────────────────────── */
 function Skeleton({ className = "" }) {
-  return <div className={`animate-pulse bg-gray-200 rounded-md ${className}`} />;
+  return <div className={`animate-pulse bg-gray-200 dark:bg-slate-700 rounded-md ${className}`} />;
 }
 
 function GradesSkeleton() {
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div className="space-y-2">
-            <Skeleton className="w-48 h-6" />
-            <Skeleton className="w-72 h-3" />
+            <Skeleton className="w-40 sm:w-48 h-6" />
+            <Skeleton className="w-56 sm:w-72 h-3" />
           </div>
-          <Skeleton className="w-48 h-9 rounded-xl" />
+          <Skeleton className="w-full sm:w-48 h-9 rounded-xl" />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <div className="md:col-span-4 bg-white rounded-xl p-6 space-y-4 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+          <div className="md:col-span-4 bg-white dark:bg-slate-800 rounded-xl p-6 space-y-4 shadow-sm">
             <Skeleton className="w-24 h-3 mx-auto" />
             <Skeleton className="w-40 h-40 rounded-full mx-auto" />
             <Skeleton className="w-48 h-3 mx-auto" />
           </div>
-          <div className="md:col-span-8 bg-white rounded-xl p-6 space-y-4 shadow-sm">
+          <div className="md:col-span-8 bg-white dark:bg-slate-800 rounded-xl p-6 space-y-4 shadow-sm">
             <Skeleton className="w-48 h-5" />
             <Skeleton className="w-full h-16" />
             <div className="grid grid-cols-3 gap-3">
-              {[1,2,3].map(i => <Skeleton key={i} className="h-16 rounded-lg" />)}
+              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
             </div>
           </div>
-          <div className="md:col-span-12 bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="md:col-span-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
             <div className="p-5 space-y-2">
               <Skeleton className="w-40 h-5" />
             </div>
-            {[1,2,3,4].map(i => (
-              <div key={i} className="px-5 py-4 border-t border-gray-100 flex gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="px-5 py-4 border-t border-gray-100 dark:border-slate-700 flex gap-4">
                 <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
                 <Skeleton className="flex-1 h-4" />
                 <Skeleton className="w-20 h-4" />
@@ -54,15 +54,15 @@ function GradesSkeleton() {
 // NOTE: Letter grades intentionally have NO minus suffix (A, B, C — not A-, B-, C-)
 // to match the student panel's GradeCard.jsx exactly, so both views agree.
 const GRADE_COLORS = {
-  "A+": { bg: "bg-green-100",  text: "text-green-700"  },
-  A:    { bg: "bg-blue-100",   text: "text-blue-700"   },
-  "B+": { bg: "bg-yellow-100", text: "text-yellow-700" },
-  B:    { bg: "bg-orange-100", text: "text-orange-700" },
-  C:    { bg: "bg-red-100",    text: "text-red-700"    },
+  "A+": { bg: "bg-green-100 dark:bg-green-900/30",  text: "text-green-700 dark:text-green-400"  },
+  A:    { bg: "bg-blue-100 dark:bg-blue-900/30",     text: "text-blue-700 dark:text-blue-400"    },
+  "B+": { bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-700 dark:text-yellow-400" },
+  B:    { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-700 dark:text-orange-400" },
+  C:    { bg: "bg-red-100 dark:bg-red-900/30",       text: "text-red-700 dark:text-red-400"      },
 };
 
 function gradeColor(grade = "") {
-  return GRADE_COLORS[grade] || { bg: "bg-slate-100", text: "text-slate-600" };
+  return GRADE_COLORS[grade] || { bg: "bg-slate-100 dark:bg-slate-700", text: "text-slate-600 dark:text-slate-300" };
 }
 
 // Convert numeric score to letter grade — same thresholds as student panel's
@@ -82,18 +82,18 @@ function scoreToGrade(score, maxScore) {
 
 // Subject icon map
 const SUBJECT_ICONS = {
-  math:       { icon: "functions",    bg: "bg-blue-100",   text: "text-blue-700"   },
-  science:    { icon: "biotech",      bg: "bg-purple-100", text: "text-purple-700" },
-  english:    { icon: "translate",    bg: "bg-orange-100", text: "text-orange-700" },
-  history:    { icon: "history_edu",  bg: "bg-teal-100",   text: "text-teal-700"   },
-  geography:  { icon: "public",       bg: "bg-green-100",  text: "text-green-700"  },
-  physics:    { icon: "bolt",         bg: "bg-yellow-100", text: "text-yellow-700" },
-  chemistry:  { icon: "science",      bg: "bg-red-100",    text: "text-red-700"    },
-  biology:    { icon: "genetics",     bg: "bg-lime-100",   text: "text-lime-700"   },
-  computer:   { icon: "computer",     bg: "bg-cyan-100",   text: "text-cyan-700"   },
-  art:        { icon: "palette",      bg: "bg-pink-100",   text: "text-pink-700"   },
-  music:      { icon: "music_note",   bg: "bg-violet-100", text: "text-violet-700" },
-  physical:   { icon: "sports",       bg: "bg-amber-100",  text: "text-amber-700"  },
+  math:       { icon: "functions",    bg: "bg-blue-100 dark:bg-blue-900/30",     text: "text-blue-700 dark:text-blue-400"     },
+  science:    { icon: "biotech",      bg: "bg-purple-100 dark:bg-purple-900/30", text: "text-purple-700 dark:text-purple-400" },
+  english:    { icon: "translate",    bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-700 dark:text-orange-400" },
+  history:    { icon: "history_edu",  bg: "bg-teal-100 dark:bg-teal-900/30",     text: "text-teal-700 dark:text-teal-400"     },
+  geography:  { icon: "public",       bg: "bg-green-100 dark:bg-green-900/30",   text: "text-green-700 dark:text-green-400"   },
+  physics:    { icon: "bolt",         bg: "bg-yellow-100 dark:bg-yellow-900/30", text: "text-yellow-700 dark:text-yellow-400" },
+  chemistry:  { icon: "science",      bg: "bg-red-100 dark:bg-red-900/30",       text: "text-red-700 dark:text-red-400"       },
+  biology:    { icon: "genetics",     bg: "bg-lime-100 dark:bg-lime-900/30",     text: "text-lime-700 dark:text-lime-400"     },
+  computer:   { icon: "computer",     bg: "bg-cyan-100 dark:bg-cyan-900/30",     text: "text-cyan-700 dark:text-cyan-400"     },
+  art:        { icon: "palette",      bg: "bg-pink-100 dark:bg-pink-900/30",     text: "text-pink-700 dark:text-pink-400"     },
+  music:      { icon: "music_note",   bg: "bg-violet-100 dark:bg-violet-900/30", text: "text-violet-700 dark:text-violet-400" },
+  physical:   { icon: "sports",       bg: "bg-amber-100 dark:bg-amber-900/30",   text: "text-amber-700 dark:text-amber-400"   },
 };
 
 function subjectStyle(name = "") {
@@ -101,14 +101,14 @@ function subjectStyle(name = "") {
   for (const key of Object.keys(SUBJECT_ICONS)) {
     if (lower.includes(key)) return SUBJECT_ICONS[key];
   }
-  return { icon: "menu_book", bg: "bg-slate-100", text: "text-slate-600" };
+  return { icon: "menu_book", bg: "bg-slate-100 dark:bg-slate-700", text: "text-slate-600 dark:text-slate-300" };
 }
 
 /* ─── Export PDF helper (print) ─────────────────────────────────────────── */
 function handleDownloadPDF(studentName, grades) {
   const win = window.open("", "_blank");
   if (!win) return;
-  const rows = grades.map(g => `
+  const rows = grades.map((g) => `
     <tr>
       <td>${g.subjectName}</td>
       <td>${g.marks_obtained ?? "—"} / ${g.max_marks ?? "—"}</td>
@@ -142,7 +142,7 @@ function handleDownloadPDF(studentName, grades) {
 }
 
 /* ─── Circular progress ─────────────────────────────────────────────────── */
-function CircularGrade({ grade, gpa, topPercent }) {
+function CircularGrade({ grade, gpa }) {
   // Map letter grade to arc fill — matches the no-minus grade scale above.
   const gradeMap = { "A+": 100, A: 85, "B+": 75, B: 65, C: 50, "N/A": 0 };
   const pct = gradeMap[grade] ?? 70;
@@ -154,8 +154,8 @@ function CircularGrade({ grade, gpa, topPercent }) {
     <div className="flex flex-col items-center justify-center text-center">
       <span className="text-xs font-bold text-primary uppercase tracking-widest mb-4">Overall Performance</span>
       <div className="relative">
-        <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-          <circle cx="80" cy="80" r={r} fill="transparent" stroke="currentColor" strokeWidth="8" className="text-surface-container-low" />
+        <svg className="w-32 h-32 sm:w-40 sm:h-40 transform -rotate-90" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r={r} fill="transparent" stroke="currentColor" strokeWidth="8" className="text-surface-container-low dark:text-slate-700" />
           <circle
             cx="80" cy="80" r={r} fill="transparent"
             stroke="currentColor" strokeWidth="8"
@@ -166,12 +166,48 @@ function CircularGrade({ grade, gpa, topPercent }) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-extrabold font-headline text-on-surface">{grade || "—"}</span>
-          {gpa && <span className="text-xs font-bold text-on-surface-variant">GPA {gpa}</span>}
+          <span className="text-4xl sm:text-5xl font-extrabold font-headline text-on-surface dark:text-white">{grade || "—"}</span>
+          {gpa && <span className="text-xs font-bold text-on-surface-variant dark:text-slate-400">GPA {gpa}</span>}
         </div>
       </div>
-      {topPercent && (
-        <p className="mt-4 text-sm text-on-surface-variant font-medium">Top {topPercent}% of the class this term.</p>
+    </div>
+  );
+}
+
+/* ─── Mobile grade card — replaces table rows on small screens ─────────── */
+function MobileGradeCard({ g, style, gc, pct, examName }) {
+  return (
+    <div className="bg-surface-container-lowest dark:bg-slate-800/60 rounded-lg p-4 border border-surface-container-low dark:border-slate-700">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`w-9 h-9 rounded-lg ${style.bg} flex items-center justify-center flex-shrink-0`}>
+          <span className={`material-symbols-outlined text-sm ${style.text}`}>{style.icon}</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <span className="font-bold text-on-surface dark:text-white text-sm block truncate">{g.subjectName}</span>
+          <span className="text-xs text-on-surface-variant dark:text-slate-400">{examName}</span>
+        </div>
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold flex-shrink-0 ${gc.bg} ${gc.text}`}>
+          {g.grade}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-center">
+        <div className="bg-surface-container-low dark:bg-slate-700 rounded-md p-2">
+          <p className="text-[10px] text-on-surface-variant dark:text-slate-400 mb-0.5">Marks</p>
+          <p className="text-xs font-bold text-on-surface dark:text-white">
+            {g.marks_obtained != null ? `${g.marks_obtained}/${g.max_marks ?? "?"}` : "—"}
+          </p>
+        </div>
+        <div className="bg-surface-container-low dark:bg-slate-700 rounded-md p-2">
+          <p className="text-[10px] text-on-surface-variant dark:text-slate-400 mb-0.5">Score</p>
+          <p className={`text-xs font-bold ${pct !== null ? (pct >= 75 ? "text-primary" : pct >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-red-500") : "text-on-surface-variant dark:text-slate-400"}`}>
+            {pct !== null ? `${pct}%` : "—"}
+          </p>
+        </div>
+      </div>
+
+      {g.remarks && g.remarks !== "No remarks provided." && (
+        <p className="text-xs text-on-surface-variant dark:text-slate-400 italic mt-2 leading-relaxed">"{g.remarks}"</p>
       )}
     </div>
   );
@@ -199,19 +235,18 @@ export default function GradesAssessmentHub() {
 
   /* ── Exam list for tab filter ── */
   const examOptions = useMemo(() => {
-    const names = [...new Set(allGrades.map(g => g.exam_name || g.exam?.name).filter(Boolean))];
-    return names;
+    return [...new Set(allGrades.map((g) => g.exam_name || g.exam?.name).filter(Boolean))];
   }, [allGrades]);
 
   const filteredGrades = useMemo(() => {
     if (activeTab === "all") return allGrades;
-    return allGrades.filter(g => (g.exam_name || g.exam?.name) === activeTab);
+    return allGrades.filter((g) => (g.exam_name || g.exam?.name) === activeTab);
   }, [allGrades, activeTab]);
 
   /* ── Compute overall grade ── */
   const overallStats = useMemo(() => {
     if (!allGrades.length) return { grade: "—", avgPct: 0 };
-    const withScores = allGrades.filter(g => g.marks_obtained != null && g.max_marks != null);
+    const withScores = allGrades.filter((g) => g.marks_obtained != null && g.max_marks != null);
     if (!withScores.length) return { grade: "—", avgPct: 0 };
     const totalPct = withScores.reduce(
       (sum, g) => sum + (parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100,
@@ -219,13 +254,13 @@ export default function GradesAssessmentHub() {
     );
     const avgPct = totalPct / withScores.length;
     const grade = scoreToGrade(avgPct, 100);
-    const gpa = (avgPct / 100 * 4).toFixed(1);
+    const gpa = ((avgPct / 100) * 4).toFixed(1);
     return { grade, avgPct: Math.round(avgPct), gpa };
   }, [allGrades]);
 
   /* ── Best & weakest subject ── */
   const { best, weakest } = useMemo(() => {
-    const withScores = allGrades.filter(g => g.marks_obtained != null && g.max_marks != null);
+    const withScores = allGrades.filter((g) => g.marks_obtained != null && g.max_marks != null);
     if (!withScores.length) return { best: null, weakest: null };
     const sorted = [...withScores].sort(
       (a, b) => (parseFloat(b.marks_obtained) / parseFloat(b.max_marks)) - (parseFloat(a.marks_obtained) / parseFloat(a.max_marks))
@@ -239,7 +274,7 @@ export default function GradesAssessmentHub() {
     return (
       <DashboardLayout>
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
-          <div className="bg-red-50 text-red-700 rounded-xl p-5 text-sm">
+          <div className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 rounded-xl p-5 text-sm">
             Could not load grades data. {error?.message || "Please try again later."}
           </div>
         </div>
@@ -248,23 +283,25 @@ export default function GradesAssessmentHub() {
   }
 
   const studentFirstName = profile?.first_name || "your child";
-  const studentFullName  = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || studentFirstName;
+  const studentFullName = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || studentFirstName;
 
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
+      <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
 
         {/* ── Header ── */}
-        <div className="flex flex-wrap justify-between items-center gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Grades &amp; Report Card</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">
+              Grades &amp; Report Card
+            </h1>
+            <p className="text-gray-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">
               Track {studentFirstName}&apos;s academic progress and subject performance.
             </p>
           </div>
           <button
             onClick={() => handleDownloadPDF(studentFullName, filteredGrades)}
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity"
           >
             <span className="material-symbols-outlined text-base">download</span>
             Download Report Card
@@ -272,46 +309,53 @@ export default function GradesAssessmentHub() {
         </div>
 
         {/* ── Bento grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
 
           {/* Overall grade circle */}
-          <div className="md:col-span-4 bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/10 flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="md:col-span-4 bg-surface-container-lowest dark:bg-slate-800/60 rounded-xl p-5 sm:p-6 shadow-sm border border-outline-variant/10 dark:border-slate-700/40 flex flex-col items-center justify-center relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16" />
             {allGrades.length === 0 ? (
               <div className="text-center py-8">
-                <span className="material-symbols-outlined text-4xl text-on-surface-variant">grade</span>
-                <p className="text-xs text-on-surface-variant mt-2">No grades available yet</p>
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant dark:text-slate-500">grade</span>
+                <p className="text-xs text-on-surface-variant dark:text-slate-400 mt-2">No grades available yet</p>
               </div>
             ) : (
-              <CircularGrade grade={overallStats.grade} gpa={overallStats.gpa} topPercent={null} />
+              <CircularGrade grade={overallStats.grade} gpa={overallStats.gpa} />
             )}
             <div className="mt-4 w-full grid grid-cols-2 gap-2">
-              <div className="bg-surface-container-low rounded-lg p-3 text-center">
-                <p className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">Avg Score</p>
-                <p className="text-lg font-bold font-headline text-on-surface">{overallStats.avgPct}%</p>
+              <div className="bg-surface-container-low dark:bg-slate-700 rounded-lg p-3 text-center">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 font-medium uppercase tracking-wider">Avg Score</p>
+                <p className="text-lg font-bold font-headline text-on-surface dark:text-white">{overallStats.avgPct}%</p>
               </div>
-              <div className="bg-surface-container-low rounded-lg p-3 text-center">
-                <p className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">Subjects</p>
-                <p className="text-lg font-bold font-headline text-on-surface">{allGrades.length}</p>
+              <div className="bg-surface-container-low dark:bg-slate-700 rounded-lg p-3 text-center">
+                <p className="text-[10px] text-on-surface-variant dark:text-slate-400 font-medium uppercase tracking-wider">Subjects</p>
+                <p className="text-lg font-bold font-headline text-on-surface dark:text-white">{allGrades.length}</p>
               </div>
             </div>
           </div>
 
           {/* AI / Performance Insight */}
-          <div className="md:col-span-8 bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-outline-variant/10 flex flex-col justify-between">
+          <div className="md:col-span-8 bg-surface-container-lowest dark:bg-slate-800/60 rounded-xl p-4 sm:p-5 shadow-sm border border-outline-variant/10 dark:border-slate-700/40 flex flex-col justify-between">
             <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="material-symbols-outlined text-tertiary text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
-                  <h3 className="text-sm font-bold font-headline text-on-surface">Performance Insight</h3>
+                  <h3 className="text-sm font-bold font-headline text-on-surface dark:text-white">Performance Insight</h3>
                 </div>
-                <p className="text-sm text-on-surface leading-relaxed">
+                <p className="text-sm text-on-surface dark:text-slate-200 leading-relaxed">
                   {allGrades.length === 0
                     ? `No assessment data available yet for ${studentFirstName}.`
                     : best
-                      ? <>{studentFirstName} is showing <span className="text-primary font-bold">strong performance in {best.subjectName}</span>{weakest && weakest.subjectName !== best.subjectName ? `. Focused effort on ${weakest.subjectName} can help boost the overall grade.` : "."}</>
-                      : `${studentFirstName}'s grades are being tracked this term.`
-                  }
+                    ? (
+                      <>
+                        {studentFirstName} is showing{" "}
+                        <span className="text-primary font-bold">strong performance in {best.subjectName}</span>
+                        {weakest && weakest.subjectName !== best.subjectName
+                          ? `. Focused effort on ${weakest.subjectName} can help boost the overall grade.`
+                          : "."}
+                      </>
+                    )
+                    : `${studentFirstName}'s grades are being tracked this term.`}
                 </p>
               </div>
               <div className="hidden sm:flex bg-tertiary/10 p-3 rounded-xl flex-shrink-0">
@@ -320,37 +364,37 @@ export default function GradesAssessmentHub() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-surface-container-low px-4 py-3 rounded-xl">
-                <span className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Best Subject</span>
-                <span className="text-xs font-semibold text-on-surface">{best?.subjectName || "—"}</span>
+              <div className="bg-surface-container-low dark:bg-slate-700 px-4 py-3 rounded-xl">
+                <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1">Best Subject</span>
+                <span className="text-xs font-semibold text-on-surface dark:text-white">{best?.subjectName || "—"}</span>
               </div>
-              <div className="bg-surface-container-low px-4 py-3 rounded-xl">
-                <span className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Needs Attention</span>
-                <span className="text-xs font-semibold text-on-surface">{weakest?.subjectName || "—"}</span>
+              <div className="bg-surface-container-low dark:bg-slate-700 px-4 py-3 rounded-xl">
+                <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1">Needs Attention</span>
+                <span className="text-xs font-semibold text-on-surface dark:text-white">{weakest?.subjectName || "—"}</span>
               </div>
-              <div className="bg-surface-container-low px-4 py-3 rounded-xl">
-                <span className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Class / Section</span>
-                <span className="text-xs font-semibold text-on-surface">
+              <div className="bg-surface-container-low dark:bg-slate-700 px-4 py-3 rounded-xl">
+                <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1">Class / Section</span>
+                <span className="text-xs font-semibold text-on-surface dark:text-white">
                   {enrollment ? `${enrollment.class_level_name} – ${enrollment.section_name}` : "N/A"}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Subject-wise table */}
-          <div className="md:col-span-12 bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/10">
-            <div className="px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-surface-container-low">
-              <h3 className="text-sm font-bold font-headline text-on-surface">Detailed Assessment</h3>
+          {/* Subject-wise table / mobile cards */}
+          <div className="md:col-span-12 bg-surface-container-lowest dark:bg-slate-800/60 rounded-xl overflow-hidden shadow-sm border border-outline-variant/10 dark:border-slate-700/40">
+            <div className="px-4 sm:px-5 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-surface-container-low dark:border-slate-700">
+              <h3 className="text-sm font-bold font-headline text-on-surface dark:text-white">Detailed Assessment</h3>
 
               {/* Exam filter tabs */}
               {examOptions.length > 0 && (
-                <div className="flex items-center bg-surface-container-low rounded-xl p-1 gap-1 flex-wrap">
+                <div className="flex items-center bg-surface-container-low dark:bg-slate-700 rounded-xl p-1 gap-1 flex-wrap w-full sm:w-auto">
                   <button
                     onClick={() => setActiveTab("all")}
-                    className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                       activeTab === "all"
-                        ? "bg-white shadow-sm text-primary"
-                        : "text-on-surface-variant hover:text-primary"
+                        ? "bg-white dark:bg-slate-600 shadow-sm text-primary dark:text-blue-300"
+                        : "text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-300"
                     }`}
                   >
                     All
@@ -359,10 +403,10 @@ export default function GradesAssessmentHub() {
                     <button
                       key={ex}
                       onClick={() => setActiveTab(ex)}
-                      className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                         activeTab === ex
-                          ? "bg-white shadow-sm text-primary"
-                          : "text-on-surface-variant hover:text-primary"
+                          ? "bg-white dark:bg-slate-600 shadow-sm text-primary dark:text-blue-300"
+                          : "text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-blue-300"
                       }`}
                     >
                       {ex}
@@ -374,98 +418,123 @@ export default function GradesAssessmentHub() {
 
             {filteredGrades.length === 0 ? (
               <div className="py-16 text-center">
-                <span className="material-symbols-outlined text-4xl text-on-surface-variant">assignment</span>
-                <p className="text-sm text-on-surface-variant mt-2">No grade records found.</p>
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant dark:text-slate-500">assignment</span>
+                <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-2">No grade records found.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-surface-container-low/50">
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Subject</th>
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Exam</th>
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Marks</th>
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Grade</th>
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Remarks</th>
-                      <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant uppercase tracking-wider text-right">Score %</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-surface-container-low">
-                    {filteredGrades.map((g, idx) => {
-                      const style = subjectStyle(g.subjectName);
-                      const gc    = gradeColor(g.grade);
-                      const pct   = g.marks_obtained != null && g.max_marks != null
-                        ? Math.round((parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100)
-                        : null;
-                      const examName = g.exam_name || g.exam?.name || "—";
+              <>
+                {/* Mobile cards (< md) */}
+                <div className="md:hidden px-4 py-4 space-y-3">
+                  {filteredGrades.map((g, idx) => {
+                    const style = subjectStyle(g.subjectName);
+                    const gc = gradeColor(g.grade);
+                    const pct = g.marks_obtained != null && g.max_marks != null
+                      ? Math.round((parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100)
+                      : null;
+                    const examName = g.exam_name || g.exam?.name || "—";
+                    return (
+                      <MobileGradeCard
+                        key={g.id || idx}
+                        g={g}
+                        style={style}
+                        gc={gc}
+                        pct={pct}
+                        examName={examName}
+                      />
+                    );
+                  })}
+                </div>
 
-                      return (
-                        <tr key={g.id || idx} className="hover:bg-surface-container-low/30 transition-colors">
-                          <td className="px-5 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-9 h-9 rounded-lg ${style.bg} flex items-center justify-center flex-shrink-0`}>
-                                <span className={`material-symbols-outlined text-base ${style.text}`}>{style.icon}</span>
-                              </div>
-                              <span className="text-xs font-bold text-on-surface">{g.subjectName}</span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 text-xs text-on-surface-variant">{examName}</td>
-                          <td className="px-5 py-4 text-xs font-semibold text-on-surface">
-                            {g.marks_obtained != null ? `${g.marks_obtained}/${g.max_marks ?? "?"}` : "—"}
-                          </td>
-                          <td className="px-5 py-4">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${gc.bg} ${gc.text}`}>
-                              {g.grade}
-                            </span>
-                          </td>
-                          <td className="px-5 py-4 text-xs text-on-surface-variant italic">{g.remarks}</td>
-                          <td className="px-5 py-4 text-right">
-                            {pct !== null ? (
-                              <div className="flex items-center justify-end gap-2">
-                                <div className="w-16 bg-surface-container rounded-full h-1.5 hidden sm:block">
-                                  <div
-                                    className={`h-1.5 rounded-full ${pct >= 75 ? "bg-primary" : pct >= 50 ? "bg-yellow-400" : "bg-red-400"}`}
-                                    style={{ width: `${pct}%` }}
-                                  />
+                {/* Desktop table (>= md) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-surface-container-low/50 dark:bg-slate-700/30">
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Subject</th>
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Exam</th>
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Marks</th>
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider">Grade</th>
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Remarks</th>
+                        <th className="px-5 py-3 text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider text-right">Score %</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-surface-container-low dark:divide-slate-700">
+                      {filteredGrades.map((g, idx) => {
+                        const style = subjectStyle(g.subjectName);
+                        const gc = gradeColor(g.grade);
+                        const pct = g.marks_obtained != null && g.max_marks != null
+                          ? Math.round((parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100)
+                          : null;
+                        const examName = g.exam_name || g.exam?.name || "—";
+
+                        return (
+                          <tr key={g.id || idx} className="hover:bg-surface-container-low/30 dark:hover:bg-slate-700/30 transition-colors">
+                            <td className="px-5 py-4">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-9 h-9 rounded-lg ${style.bg} flex items-center justify-center flex-shrink-0`}>
+                                  <span className={`material-symbols-outlined text-base ${style.text}`}>{style.icon}</span>
                                 </div>
-                                <span className={`text-xs font-bold ${pct >= 75 ? "text-primary" : pct >= 50 ? "text-yellow-600" : "text-red-500"}`}>
-                                  {pct}%
-                                </span>
+                                <span className="text-xs font-bold text-on-surface dark:text-white">{g.subjectName}</span>
                               </div>
-                            ) : (
-                              <span className="text-xs text-on-surface-variant">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            </td>
+                            <td className="px-5 py-4 text-xs text-on-surface-variant dark:text-slate-400">{examName}</td>
+                            <td className="px-5 py-4 text-xs font-semibold text-on-surface dark:text-white">
+                              {g.marks_obtained != null ? `${g.marks_obtained}/${g.max_marks ?? "?"}` : "—"}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${gc.bg} ${gc.text}`}>
+                                {g.grade}
+                              </span>
+                            </td>
+                            <td className="px-5 py-4 text-xs text-on-surface-variant dark:text-slate-400 italic hidden lg:table-cell">{g.remarks}</td>
+                            <td className="px-5 py-4 text-right">
+                              {pct !== null ? (
+                                <div className="flex items-center justify-end gap-2">
+                                  <div className="w-16 bg-surface-container dark:bg-slate-600 rounded-full h-1.5 hidden lg:block">
+                                    <div
+                                      className={`h-1.5 rounded-full ${pct >= 75 ? "bg-primary" : pct >= 50 ? "bg-yellow-400" : "bg-red-400"}`}
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                  <span className={`text-xs font-bold ${pct >= 75 ? "text-primary" : pct >= 50 ? "text-yellow-600 dark:text-yellow-400" : "text-red-500"}`}>
+                                    {pct}%
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-xs text-on-surface-variant dark:text-slate-400">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
 
-            <div className="px-5 py-3 bg-surface-container-low/30 border-t border-surface-container-low">
-              <p className="text-[10px] text-on-surface-variant">
+            <div className="px-4 sm:px-5 py-3 bg-surface-container-low/30 dark:bg-slate-700/20 border-t border-surface-container-low dark:border-slate-700">
+              <p className="text-[10px] text-on-surface-variant dark:text-slate-400">
                 Grades are verified by the Academic Board · {enrollment?.academic_year_name || "Current academic year"}
               </p>
             </div>
           </div>
 
           {/* Bottom cards row */}
-          <div className="md:col-span-12 grid md:grid-cols-2 gap-6">
+          <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 
             {/* Best subject highlight */}
-            <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-md bg-gradient-to-br from-blue-700 to-blue-600">
+            <div className="relative overflow-hidden rounded-2xl p-5 sm:p-6 text-white shadow-md bg-gradient-to-br from-blue-700 to-blue-600">
               <div className="relative z-10">
                 <h4 className="text-sm font-bold font-headline mb-2">Top Performing Subject</h4>
                 {best ? (
                   <>
-                    <p className="text-3xl font-extrabold font-headline mb-1">{best.subjectName}</p>
+                    <p className="text-2xl sm:text-3xl font-extrabold font-headline mb-1">{best.subjectName}</p>
                     <p className="text-blue-100 text-sm mb-4">
                       {best.marks_obtained}/{best.max_marks} marks · Grade {best.grade}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className={`w-8 h-8 rounded-lg ${subjectStyle(best.subjectName).bg} flex items-center justify-center`}>
+                      <span className={`w-8 h-8 rounded-lg ${subjectStyle(best.subjectName).bg} flex items-center justify-center flex-shrink-0`}>
                         <span className={`material-symbols-outlined text-base ${subjectStyle(best.subjectName).text}`}>
                           {subjectStyle(best.subjectName).icon}
                         </span>
@@ -477,18 +546,18 @@ export default function GradesAssessmentHub() {
                   <p className="text-blue-100 text-sm">No subject data available yet.</p>
                 )}
               </div>
-              <span className="material-symbols-outlined absolute bottom-2 right-4 text-white/10 text-[110px]">
+              <span className="material-symbols-outlined absolute bottom-2 right-4 text-white/10 text-[80px] sm:text-[110px]">
                 star
               </span>
             </div>
 
             {/* Weakest subject / focus area */}
-            <div className="relative overflow-hidden rounded-2xl p-6 text-white shadow-md bg-gradient-to-br from-purple-600 to-indigo-600">
+            <div className="relative overflow-hidden rounded-2xl p-5 sm:p-6 text-white shadow-md bg-gradient-to-br from-purple-600 to-indigo-600">
               <div className="relative z-10">
                 <h4 className="text-sm font-bold font-headline mb-2">Focus Area</h4>
                 {weakest && weakest.subjectName !== best?.subjectName ? (
                   <>
-                    <p className="text-3xl font-extrabold font-headline mb-1">{weakest.subjectName}</p>
+                    <p className="text-2xl sm:text-3xl font-extrabold font-headline mb-1">{weakest.subjectName}</p>
                     <p className="text-purple-100 text-sm mb-4">
                       {weakest.marks_obtained}/{weakest.max_marks} marks · Grade {weakest.grade}
                     </p>
@@ -504,11 +573,10 @@ export default function GradesAssessmentHub() {
                   </p>
                 )}
               </div>
-              <span className="material-symbols-outlined absolute bottom-2 right-4 text-white/20 text-[80px]">
+              <span className="material-symbols-outlined absolute bottom-2 right-4 text-white/20 text-[60px] sm:text-[80px]">
                 menu_book
               </span>
             </div>
-
           </div>
         </div>
       </div>
