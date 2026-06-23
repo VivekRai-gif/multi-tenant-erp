@@ -1,36 +1,37 @@
 import React, { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "../../components/erp/parent/DashboardLayout";
 import { useParent } from "../../context/ParentProvider";
+import { getChildAssignments } from "../../services/parentAPIs";
 
 /* ─────────────────────────────────────────────
    Skeleton
 ───────────────────────────────────────────── */
 function Skeleton({ className = "" }) {
-  return <div className={`animate-pulse bg-gray-200 rounded-md ${className}`} />;
+  return <div className={`animate-pulse bg-slate-200 dark:bg-slate-700 rounded-md ${className}`} />;
 }
 
 function AssignmentsSkeleton() {
   return (
     <DashboardLayout>
-      <div className="space-y-5">
+      <div className="space-y-5 p-1">
         <div className="space-y-2">
           <Skeleton className="w-40 h-7" />
           <Skeleton className="w-64 h-4" />
         </div>
         <Skeleton className="w-full h-20 rounded-xl" />
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl p-4 border space-y-2">
-              <Skeleton className="w-24 h-3" />
-              <Skeleton className="w-14 h-8" />
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl p-5 border dark:border-slate-700 space-y-3">
+              <Skeleton className="w-20 h-3" />
+              <Skeleton className="w-12 h-8" />
             </div>
           ))}
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           <div className="xl:col-span-2 space-y-3">
-            {[1, 2, 3].map(i => <Skeleton key={i} className="w-full h-20 rounded-xl" />)}
+            {[1, 2, 3, 4].map(i => <Skeleton key={i} className="w-full h-20 rounded-xl" />)}
           </div>
-          <Skeleton className="h-56 rounded-xl" />
+          <Skeleton className="h-64 rounded-xl" />
         </div>
       </div>
     </DashboardLayout>
@@ -38,149 +39,154 @@ function AssignmentsSkeleton() {
 }
 
 /* ─────────────────────────────────────────────
-   Subject icons
+   Helpers
 ───────────────────────────────────────────── */
-const SUBJECT_ICONS = {
-  physics:            { icon: "science",      bg: "bg-blue-50",    color: "text-blue-600"    },
-  mathematics:        { icon: "calculate",    bg: "bg-purple-50",  color: "text-purple-600"  },
-  math:               { icon: "calculate",    bg: "bg-purple-50",  color: "text-purple-600"  },
-  literature:         { icon: "menu_book",    bg: "bg-orange-50",  color: "text-orange-600"  },
-  english:            { icon: "menu_book",    bg: "bg-orange-50",  color: "text-orange-600"  },
-  chemistry:          { icon: "experiment",   bg: "bg-green-50",   color: "text-green-600"   },
-  biology:            { icon: "biotech",      bg: "bg-emerald-50", color: "text-emerald-600" },
-  "computer science": { icon: "code",         bg: "bg-indigo-50",  color: "text-indigo-600"  },
-  history:            { icon: "history_edu",  bg: "bg-amber-50",   color: "text-amber-600"   },
+const SUBJECT_META = {
+  physics:           { icon: "science",     bg: "bg-blue-100",    color: "text-blue-600"    },
+  mathematics:       { icon: "calculate",   bg: "bg-purple-100",  color: "text-purple-600"  },
+  math:              { icon: "calculate",   bg: "bg-purple-100",  color: "text-purple-600"  },
+  english:           { icon: "menu_book",   bg: "bg-orange-100",  color: "text-orange-600"  },
+  literature:        { icon: "menu_book",   bg: "bg-orange-100",  color: "text-orange-600"  },
+  chemistry:         { icon: "experiment",  bg: "bg-green-100",   color: "text-green-600"   },
+  biology:           { icon: "biotech",     bg: "bg-emerald-100", color: "text-emerald-600" },
+  "computer science":{ icon: "code",        bg: "bg-indigo-100",  color: "text-indigo-600"  },
+  history:           { icon: "history_edu", bg: "bg-amber-100",   color: "text-amber-600"   },
+  hindi:             { icon: "translate",   bg: "bg-red-100",     color: "text-red-600"     },
+  science:           { icon: "science",     bg: "bg-sky-100",     color: "text-sky-600"     },
+  "social studies":  { icon: "public",      bg: "bg-teal-100",    color: "text-teal-600"    },
 };
 
-function getSubjectMeta(subjectName) {
-  const key = (subjectName || "").toLowerCase();
-  return SUBJECT_ICONS[key] || { icon: "assignment", bg: "bg-slate-50", color: "text-slate-600" };
+function subjectMeta(name) {
+  return SUBJECT_META[(name || "").toLowerCase()] ||
+         { icon: "assignment", bg: "bg-slate-100", color: "text-slate-600" };
 }
 
-const STATUS_BADGE = {
-  Pending:   "bg-amber-100  text-amber-700",
-  Submitted: "bg-purple-100 text-purple-700",
-  Graded:    "bg-blue-100   text-blue-700",
+const STATUS_STYLES = {
+  Pending:   { badge: "bg-amber-100 text-amber-800",   dot: "bg-amber-500"  },
+  Submitted: { badge: "bg-purple-100 text-purple-800", dot: "bg-purple-500" },
+  Graded:    { badge: "bg-blue-100 text-blue-800",     dot: "bg-blue-500"   },
 };
 
-function formatDueDate(dueDateStr) {
+function dueLabel(dueDateStr) {
+  if (!dueDateStr) return { text: "No deadline", urgent: false };
   const due  = new Date(dueDateStr);
   const now  = new Date();
-  const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
-  const timeStr = due.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  if (diff < 0)   return { text: `Overdue — ${due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`, urgent: true };
-  if (diff === 0) return { text: `Today, ${timeStr}`, urgent: true };
-  if (diff === 1) return { text: `Tomorrow, ${timeStr}`, urgent: true };
-  return { text: due.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), urgent: false };
+  const diff = Math.ceil((due - now) / 864e5);
+  const time = due.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const date = due.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  if (diff < 0)   return { text: `Overdue · ${due.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`, urgent: true };
+  if (diff === 0) return { text: `Today, ${time}`, urgent: true };
+  if (diff === 1) return { text: `Tomorrow, ${time}`, urgent: true };
+  return { text: date, urgent: false };
+}
+
+function UnauthorizedState({ childName }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+      <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
+        <span className="material-symbols-outlined text-amber-500 text-3xl">lock</span>
+      </div>
+      <div>
+        <p className="font-bold text-slate-800 dark:text-white text-base">
+          Academic access not enabled for {childName}
+        </p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          Contact the school to enable academic data access for this child.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 /* ─────────────────────────────────────────────
-   Main Component
+   Main
 ───────────────────────────────────────────── */
 export default function AssignmentsOverview() {
-  const { profile, activeChild, token } = useParent();
+  const { activeChild, loading: ctxLoading, error: ctxError } = useParent();
 
-  const [assignments, setAssignments] = useState([]);
-  const [childInfo,   setChildInfo]   = useState(null);
-  const [loading,     setLoading]     = useState(true);
-  const [error,       setError]       = useState(null);
+  const [assignments,  setAssignments]  = useState([]);
+  const [childInfo,    setChildInfo]    = useState(null);
+  const [fetching,     setFetching]     = useState(true);
+  const [fetchError,   setFetchError]   = useState(null);
+  const [unauthorized, setUnauthorized] = useState(false);
 
   const [subjectFilter, setSubjectFilter] = useState("All Subjects");
   const [statusFilter,  setStatusFilter]  = useState("All Status");
 
-  /* ── Fetch assignments whenever active child changes ── */
   useEffect(() => {
-    if (!activeChild?.id || !token) return;
+    if (!activeChild?.id) { setFetching(false); return; }
+    let cancelled = false;
 
-    const fetchAssignments = async () => {
-      setLoading(true);
-      setError(null);
+    (async () => {
+      setFetching(true);
+      setFetchError(null);
+      setUnauthorized(false);
+      setAssignments([]);
+      setChildInfo(null);
       try {
-        const res = await fetch(
-          `/api/v1/profiles/parents/me/children/${activeChild.id}/assignments/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.detail || `Error ${res.status}`);
+        const data = await getChildAssignments(activeChild.id);
+        if (cancelled) return;
+        if (data.unauthorized) {
+          setUnauthorized(true);
+        } else {
+          setAssignments(data.results || []);
+          setChildInfo(data.child   || null);
         }
-
-        const data = await res.json();
-        // Response shape: { child: {...}, count: N, results: [...] }
-        setAssignments(data.results || []);
-        setChildInfo(data.child || null);
-      } catch (err) {
-        setError(err);
+      } catch (e) {
+        if (!cancelled) setFetchError(e);
       } finally {
-        setLoading(false);
+        if (!cancelled) setFetching(false);
       }
-    };
+    })();
 
-    fetchAssignments();
-  }, [activeChild?.id, token]);
+    return () => { cancelled = true; };
+  }, [activeChild?.id]);
 
-  /* ── Derived values (all hooks unconditionally at top) ── */
-  const list = assignments;
-
+  /* derived */
   const subjectOptions = useMemo(
-    () => ["All Subjects", ...Array.from(new Set(list.map(a => a.subject_name).filter(Boolean)))],
-    [list]
+    () => ["All Subjects", ...Array.from(new Set(assignments.map(a => a.subject_name).filter(Boolean)))],
+    [assignments]
   );
 
-  const total          = list.length;
-  const submittedCount = list.filter(a => a.submission_status === "Submitted" || a.submission_status === "Graded").length;
-  const pendingCount   = list.filter(a => a.submission_status === "Pending").length;
+  const total          = assignments.length;
+  const submittedCount = assignments.filter(a => ["Submitted","Graded"].includes(a.submission_status)).length;
+  const pendingCount   = assignments.filter(a => a.submission_status === "Pending").length;
   const submissionRate = total > 0 ? Math.round((submittedCount / total) * 100) : 0;
 
-  const gradedAssignments = list.filter(a => a.submission_status === "Graded" && a.grade != null);
-  const avgGradePct = gradedAssignments.length > 0
-    ? Math.round(gradedAssignments.reduce((sum, a) => sum + parseFloat(a.grade), 0) / gradedAssignments.length)
+  const gradedList = assignments.filter(a => a.submission_status === "Graded" && a.grade != null);
+  const avgGrade   = gradedList.length > 0
+    ? Math.round(gradedList.reduce((s, a) => s + parseFloat(a.grade), 0) / gradedList.length)
     : null;
 
-  const upcomingPending = [...list]
+  const nextPending = [...assignments]
     .filter(a => a.submission_status === "Pending")
     .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))[0];
 
-  const filteredList = list.filter(a => {
-    const matchSubject = subjectFilter === "All Subjects" || a.subject_name === subjectFilter;
-    const matchStatus  = statusFilter  === "All Status"  || a.submission_status === statusFilter;
-    return matchSubject && matchStatus;
-  });
+  const filtered = assignments
+    .filter(a => (subjectFilter === "All Subjects" || a.subject_name === subjectFilter))
+    .filter(a => (statusFilter  === "All Status"   || a.submission_status === statusFilter))
+    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
 
-  const sortedList = [...filteredList].sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
+  const studentName      = childInfo?.name || activeChild?.name || "Student";
+  const studentFirstName = studentName.split(" ")[0];
 
-  /* ── Derive student name: prefer child info from API response, fall back to activeChild / profile ── */
-  const studentFirstName =
-    childInfo?.name?.split(" ")[0] ||
-    activeChild?.name?.split(" ")[0] ||
-    profile?.first_name ||
-    "your child";
+  if (ctxLoading || fetching) return <AssignmentsSkeleton />;
 
-  /* ── Early returns after all hooks ── */
-  if (loading) return <AssignmentsSkeleton />;
-
-  if (error || !profile) {
+  if (ctxError || fetchError) {
     return (
       <DashboardLayout>
-        <div className="bg-red-50 text-red-700 rounded-lg p-5 text-sm">
-          Could not load assignments. {error?.message || "Please try again later."}
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-xl p-5 text-sm">
+          Could not load assignments. {(ctxError || fetchError)?.message || "Please try again later."}
         </div>
       </DashboardLayout>
     );
   }
 
-  /* ── No active child selected ── */
   if (!activeChild?.id) {
     return (
       <DashboardLayout>
-        <div className="bg-amber-50 text-amber-700 rounded-lg p-5 text-sm">
-          No active child selected. Please switch to a child profile first.
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 text-amber-700 rounded-xl p-5 text-sm">
+          No active child selected.
         </div>
       </DashboardLayout>
     );
@@ -188,233 +194,286 @@ export default function AssignmentsOverview() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-5 sm:space-y-6">
 
-        {/* ── HEADER ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Assignments</h1>
-            <p className="text-gray-500 text-sm mt-0.5">
-              Track, review, and manage {studentFirstName}&apos;s coursework.
-            </p>
-          </div>
+        {/* HEADER */}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Assignments</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            Track, review, and manage {studentFirstName}&apos;s coursework.
+          </p>
         </div>
 
-        {/* ── AI INSIGHT BANNER ── */}
-        {upcomingPending ? (
-          <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl p-4 sm:p-5
-                          flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-            <div className="flex items-start sm:items-center gap-3">
-              <div className="bg-white/20 p-2.5 rounded-lg shrink-0">
-                <span className="material-symbols-outlined text-white text-lg">psychology</span>
-              </div>
-              <div>
-                <p className="text-[10px] text-blue-100 uppercase tracking-wider font-bold">AI Intelligence Insight</p>
-                <p className="text-white font-semibold text-sm sm:text-base leading-snug">
-                  {upcomingPending.title} ({upcomingPending.subject_name}) is due{" "}
-                  {formatDueDate(upcomingPending.due_date).text.toLowerCase()}.
-                </p>
-              </div>
-            </div>
-            <button className="self-start sm:self-auto shrink-0 bg-white text-blue-700 px-4 py-2 rounded-md text-sm font-semibold hover:bg-blue-50 transition">
-              Review Now
-            </button>
-          </div>
+        {unauthorized ? (
+          <UnauthorizedState childName={studentName} />
         ) : (
-          <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-xl p-4 sm:p-5 flex items-center gap-3 shadow-md">
-            <div className="bg-white/20 p-2.5 rounded-lg shrink-0">
-              <span className="material-symbols-outlined text-white text-lg">check_circle</span>
-            </div>
-            <p className="text-white font-semibold text-sm sm:text-base">
-              All caught up — no pending assignments right now.
-            </p>
-          </div>
-        )}
-
-        {/* ── METRIC CARDS ── */}
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex justify-between items-start">
-            <div>
-              <p className="text-gray-500 text-xs sm:text-sm">Total</p>
-              <p className="text-2xl sm:text-3xl font-bold mt-0.5">{total}</p>
-            </div>
-            <div className="bg-gray-100 p-2 rounded-lg shrink-0">
-              <span className="material-symbols-outlined text-blue-600 text-lg">analytics</span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex justify-between items-start">
-            <div>
-              <p className="text-gray-500 text-xs sm:text-sm">Submitted</p>
-              <p className="text-2xl sm:text-3xl font-bold text-purple-600 mt-0.5">{submittedCount}</p>
-            </div>
-            <div className="bg-purple-100 p-2 rounded-lg shrink-0">
-              <span className="material-symbols-outlined text-purple-600 text-lg">check_circle</span>
-            </div>
-          </div>
-
-          <div className="col-span-2 xl:col-span-1 bg-white rounded-xl p-4 sm:p-5 shadow-sm border flex justify-between items-start">
-            <div>
-              <p className="text-gray-500 text-xs sm:text-sm">Pending</p>
-              <p className="text-2xl sm:text-3xl font-bold text-amber-700 mt-0.5">{pendingCount}</p>
-            </div>
-            <div className="bg-amber-100 p-2 rounded-lg shrink-0">
-              <span className="material-symbols-outlined text-amber-700 text-lg">pending_actions</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── ROADMAP + SIDEBAR ── */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
-
-          {/* ROADMAP */}
-          <div className="xl:col-span-2 space-y-3">
-            {/* Filter row */}
-            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2 flex-wrap">
-              <h3 className="text-base sm:text-lg font-semibold">Assignment Roadmap</h3>
-              <div className="flex gap-2 w-full xs:w-auto">
-                <select
-                  value={subjectFilter}
-                  onChange={e => setSubjectFilter(e.target.value)}
-                  className="flex-1 xs:flex-none border rounded-md px-2 py-1.5 text-xs sm:text-sm bg-white min-w-0"
-                >
-                  {subjectOptions.map(s => <option key={s}>{s}</option>)}
-                </select>
-                <select
-                  value={statusFilter}
-                  onChange={e => setStatusFilter(e.target.value)}
-                  className="flex-1 xs:flex-none border rounded-md px-2 py-1.5 text-xs sm:text-sm bg-white min-w-0"
-                >
-                  <option>All Status</option>
-                  <option>Pending</option>
-                  <option>Submitted</option>
-                  <option>Graded</option>
-                </select>
+          <>
+            {/* INSIGHT BANNER */}
+            {nextPending ? (
+              <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-2xl p-4 sm:p-5
+                              flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="bg-white/20 p-2.5 rounded-xl shrink-0">
+                    <span className="material-symbols-outlined text-white text-xl">psychology</span>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-blue-100 uppercase tracking-widest font-bold mb-0.5">
+                      AI Intelligence Insight
+                    </p>
+                    <p className="text-white font-semibold text-sm sm:text-base leading-snug">
+                      <span className="font-bold">{nextPending.title}</span>
+                      {" "}({nextPending.subject_name}) is due {dueLabel(nextPending.due_date).text.toLowerCase()}.
+                    </p>
+                  </div>
+                </div>
+                <button className="self-start sm:self-auto shrink-0 bg-white text-blue-700 px-4 py-2
+                                   rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors">
+                  Review Now
+                </button>
               </div>
-            </div>
-
-            {sortedList.length === 0 && (
-              <div className="bg-white rounded-xl p-8 shadow-sm border text-center text-sm text-gray-500">
-                No assignments match the selected filters.
+            ) : (
+              <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-2xl p-4 sm:p-5
+                              flex items-center gap-3 shadow-lg">
+                <div className="bg-white/20 p-2.5 rounded-xl shrink-0">
+                  <span className="material-symbols-outlined text-white text-xl">check_circle</span>
+                </div>
+                <p className="text-white font-semibold text-sm sm:text-base">
+                  All caught up — no pending assignments right now!
+                </p>
               </div>
             )}
 
-            {sortedList.map(a => {
-              const meta        = getSubjectMeta(a.subject_name);
-              const due         = formatDueDate(a.due_date);
-              const isGraded    = a.submission_status === "Graded";
-              const isSubmitted = a.submission_status === "Submitted";
+            {/* METRIC CARDS */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5
+                              border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Total</p>
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-slate-600 dark:text-slate-300 text-base">analytics</span>
+                  </div>
+                </div>
+                <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">{total}</p>
+              </div>
 
-              return (
-                <div
-                  key={a.id}
-                  className="bg-white rounded-xl p-3 sm:p-4 shadow-sm border
-                             flex items-center gap-3 sm:gap-4 hover:shadow-md transition"
-                >
-                  {/* Subject icon */}
-                  <div className={`${meta.bg} p-2 sm:p-3 rounded-lg shrink-0`}>
-                    <span className={`material-symbols-outlined ${meta.color} text-lg sm:text-xl`}>
-                      {meta.icon}
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5
+                              border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Submitted</p>
+                  <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-purple-600 dark:text-purple-400 text-base">check_circle</span>
+                  </div>
+                </div>
+                <p className="text-3xl sm:text-4xl font-extrabold text-purple-600 dark:text-purple-400">{submittedCount}</p>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5
+                              border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Pending</p>
+                  <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-base">pending_actions</span>
+                  </div>
+                </div>
+                <p className="text-3xl sm:text-4xl font-extrabold text-amber-600 dark:text-amber-400">{pendingCount}</p>
+              </div>
+            </div>
+
+            {/* ROADMAP + SIDEBAR */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-5">
+
+              {/* Left: list */}
+              <div className="xl:col-span-2 space-y-3">
+
+                {/* Filters */}
+                <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white">
+                    Assignment Roadmap
+                  </h3>
+                  <div className="flex gap-2 w-full xs:w-auto">
+                    <select
+                      value={subjectFilter}
+                      onChange={e => { setSubjectFilter(e.target.value); }}
+                      className="flex-1 xs:flex-none border border-slate-200 dark:border-slate-600
+                                 rounded-lg px-3 py-2 text-xs sm:text-sm
+                                 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                      {subjectOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <select
+                      value={statusFilter}
+                      onChange={e => { setStatusFilter(e.target.value); }}
+                      className="flex-1 xs:flex-none border border-slate-200 dark:border-slate-600
+                                 rounded-lg px-3 py-2 text-xs sm:text-sm
+                                 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                    >
+                      {["All Status","Pending","Submitted","Graded"].map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Empty */}
+                {filtered.length === 0 && (
+                  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200
+                                  dark:border-slate-700 p-10 text-center">
+                    <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 text-5xl">
+                      assignment
                     </span>
-                  </div>
-
-                  {/* Main info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] sm:text-xs text-gray-400 uppercase font-medium truncate">
-                      {a.subject_name}{a.section_name ? ` • ${a.section_name}` : ""}
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                      No assignments match the selected filters.
                     </p>
-                    <p className="font-semibold text-sm sm:text-base leading-tight truncate">{a.title}</p>
-                    {a.teacher_name && (
-                      <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">By {a.teacher_name}</p>
-                    )}
                   </div>
+                )}
 
-                  {/* Due / grade — hidden on very small screens */}
-                  <div className="hidden sm:block text-right shrink-0">
-                    {isGraded ? (
-                      <>
-                        <p className="text-[10px] text-gray-400">Grade</p>
-                        <p className="text-blue-600 font-semibold text-sm">{a.grade}</p>
-                      </>
-                    ) : isSubmitted ? (
-                      <>
-                        <p className="text-[10px] text-gray-400">Submitted</p>
-                        <p className="text-gray-700 text-sm font-semibold">
-                          {a.submitted_at
-                            ? new Date(a.submitted_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })
-                            : "—"}
+                {/* Cards */}
+                {filtered.map(a => {
+                  const meta   = subjectMeta(a.subject_name);
+                  const due    = dueLabel(a.due_date);
+                  const st     = STATUS_STYLES[a.submission_status] || { badge: "bg-slate-100 text-slate-700" };
+                  const graded = a.submission_status === "Graded";
+                  const subm   = a.submission_status === "Submitted";
+
+                  return (
+                    <div key={a.id}
+                         className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200
+                                    dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow
+                                    p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
+
+                      {/* Icon */}
+                      <div className={`${meta.bg} w-10 h-10 sm:w-12 sm:h-12 rounded-xl
+                                       flex items-center justify-center shrink-0`}>
+                        <span className={`material-symbols-outlined ${meta.color} text-xl sm:text-2xl`}>
+                          {meta.icon}
+                        </span>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] sm:text-xs font-semibold text-slate-400
+                                      dark:text-slate-500 uppercase tracking-wider truncate mb-0.5">
+                          {a.subject_name || "—"}{a.section_name ? ` · ${a.section_name}` : ""}
                         </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-[10px] text-gray-400">Deadline</p>
-                        <p className={`text-sm font-semibold ${due.urgent ? "text-red-500" : "text-gray-700"}`}>
-                          {due.text}
+                        <p className="text-sm sm:text-base font-bold text-slate-800 dark:text-white
+                                      leading-snug line-clamp-2">
+                          {a.title || "Untitled Assignment"}
                         </p>
-                      </>
-                    )}
+                        {a.teacher_name && (
+                          <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                            By {a.teacher_name}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Due/grade desktop */}
+                      <div className="hidden sm:flex flex-col items-end shrink-0 min-w-[100px]">
+                        {graded ? (
+                          <>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500">Grade</p>
+                            <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                              {a.grade != null ? `${a.grade}%` : "—"}
+                            </p>
+                          </>
+                        ) : subm ? (
+                          <>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500">Submitted</p>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                              {a.submitted_at
+                                ? new Date(a.submitted_at).toLocaleDateString("en-US",{ month:"short", day:"numeric" })
+                                : "—"}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-[10px] text-slate-400 dark:text-slate-500">Deadline</p>
+                            <p className={`text-sm font-bold ${due.urgent ? "text-red-500" : "text-slate-700 dark:text-slate-300"}`}>
+                              {due.text}
+                            </p>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Badge */}
+                      <span className={`text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-bold
+                                        shrink-0 whitespace-nowrap ${st.badge}`}>
+                        {a.submission_status}
+                      </span>
+
+                      <span className="material-symbols-outlined text-slate-300 dark:text-slate-600
+                                       text-lg shrink-0 hidden sm:block">chevron_right</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Right: stats */}
+              <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200
+                              dark:border-slate-700 shadow-sm p-4 sm:p-5 h-fit space-y-5">
+
+                <h4 className="font-bold text-slate-800 dark:text-white text-sm sm:text-base">
+                  Quick Statistics
+                </h4>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Submission Rate</span>
+                    <span className="text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400">{submissionRate}%</span>
                   </div>
+                  <div className="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-blue-600 rounded-full transition-all duration-700"
+                         style={{ width: `${submissionRate}%` }} />
+                  </div>
+                </div>
 
-                  {/* Status badge */}
-                  <span className={`text-[10px] sm:text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-semibold shrink-0
-                                   ${STATUS_BADGE[a.submission_status] || "bg-slate-100 text-slate-700"}`}>
-                    {a.submission_status}
-                  </span>
-
-                  <span className="material-symbols-outlined text-gray-300 text-lg shrink-0 hidden sm:block">
-                    chevron_right
+                <div className="flex justify-between items-center py-3 border-t border-slate-100 dark:border-slate-700">
+                  <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Avg. Grade</span>
+                  <span className="text-xs sm:text-sm font-bold text-purple-600 dark:text-purple-400">
+                    {avgGrade != null ? `${avgGrade}%` : "No grades yet"}
                   </span>
                 </div>
-              );
-            })}
-          </div>
 
-          {/* QUICK STATS SIDEBAR */}
-          <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border h-fit">
-            <h4 className="font-semibold mb-4 text-sm sm:text-base">Quick Statistics</h4>
-
-            <div className="mb-4">
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-gray-500">Submission Rate</span>
-                <span className="font-semibold text-blue-600">{submissionRate}%</span>
-              </div>
-              <div className="h-1.5 bg-gray-100 rounded-full mt-2">
-                <div className="h-1.5 bg-blue-600 rounded-full" style={{ width: `${submissionRate}%` }} />
-              </div>
-            </div>
-
-            <div className="flex justify-between text-xs sm:text-sm mb-4">
-              <span className="text-gray-500">Avg. Grade</span>
-              <span className="text-purple-600 font-semibold">
-                {avgGradePct != null ? `${avgGradePct}%` : "No grades yet"}
-              </span>
-            </div>
-
-            <div className="border-t pt-4">
-              <p className="text-[10px] sm:text-xs text-gray-400 uppercase font-bold mb-2">Pending</p>
-              {pendingCount === 0 ? (
-                <p className="text-xs sm:text-sm text-gray-400">Nothing pending right now.</p>
-              ) : (
-                list
-                  .filter(a => a.submission_status === "Pending")
-                  .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
-                  .slice(0, 3)
-                  .map(a => (
-                    <div key={a.id} className="mb-2.5">
-                      <div className="flex gap-2 items-start text-xs sm:text-sm">
-                        <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 shrink-0" />
-                        <span className="font-medium truncate">{a.title}</span>
-                      </div>
-                      <p className="text-[10px] sm:text-xs text-gray-400 ml-3.5">
-                        {formatDueDate(a.due_date).text}
-                      </p>
+                <div className="border-t border-slate-100 dark:border-slate-700 pt-4">
+                  <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500
+                                uppercase tracking-wider mb-3">Upcoming Pending</p>
+                  {pendingCount === 0 ? (
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-400 dark:text-slate-500">
+                      <span className="material-symbols-outlined text-emerald-500 text-base">check_circle</span>
+                      Nothing pending right now.
                     </div>
-                  ))
-              )}
+                  ) : (
+                    <div className="space-y-3">
+                      {assignments
+                        .filter(a => a.submission_status === "Pending")
+                        .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+                        .slice(0, 4)
+                        .map(a => {
+                          const due = dueLabel(a.due_date);
+                          return (
+                            <div key={a.id} className="flex gap-2.5 items-start">
+                              <div className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="text-xs sm:text-sm font-semibold text-slate-700
+                                              dark:text-slate-200 truncate leading-tight">
+                                  {a.title || "Untitled"}
+                                </p>
+                                <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                                  {a.subject_name} · {due.text}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
 
-        </div>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );

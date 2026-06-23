@@ -174,6 +174,78 @@ function CircularGrade({ grade, gpa }) {
   );
 }
 
+/* ─── Performance trend chart — score % across exams over time ─────────── */
+function PerformanceTrendChart({ data }) {
+  // data: [{ name, date, pct }] sorted chronologically
+  if (!data.length) return null;
+
+  const width = 560;
+  const height = 88;
+  const padX = 28;
+  const padY = 16;
+  const innerW = width - padX * 2;
+  const innerH = height - padY * 2;
+
+  // Single data point: nothing to draw a line between yet — show one
+  // highlighted dot instead of a flat/misleading line.
+  if (data.length === 1) {
+    const point = data[0];
+    return (
+      <div className="mt-4 sm:mt-5">
+        <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+          Performance Trend
+        </span>
+        <div className="flex items-center gap-3 bg-surface-container-low dark:bg-slate-700 rounded-xl px-4 py-3">
+          <div className="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-on-surface dark:text-white">
+              {point.name} · {point.pct}%
+            </p>
+            <p className="text-[11px] text-on-surface-variant dark:text-slate-400">
+              A trend line will appear here once more exams are recorded.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const xStep = innerW / (data.length - 1);
+  const yFor = (pct) => padY + innerH - (Math.min(100, Math.max(0, pct)) / 100) * innerH;
+  const points = data.map((d, i) => ({ ...d, x: padX + i * xStep, y: yFor(d.pct) }));
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
+  const areaPath = `${linePath} L${points[points.length - 1].x},${padY + innerH} L${points[0].x},${padY + innerH} Z`;
+
+  return (
+    <div className="mt-4 sm:mt-5">
+      <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-2">
+        Performance Trend
+      </span>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" preserveAspectRatio="xMidYMid meet">
+        {/* Reference lines at 50% and 100% */}
+        <line x1={padX} y1={yFor(100)} x2={width - padX} y2={yFor(100)} stroke="currentColor" strokeWidth="1" className="text-surface-container-low dark:text-slate-600" strokeDasharray="3,3" />
+        <line x1={padX} y1={yFor(50)} x2={width - padX} y2={yFor(50)} stroke="currentColor" strokeWidth="1" className="text-surface-container-low dark:text-slate-600" strokeDasharray="3,3" />
+
+        <path d={areaPath} fill="currentColor" className="text-primary/10" />
+        <path d={linePath} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" className="text-primary" />
+
+        {points.map((p, i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r="4" fill="currentColor" className="text-primary" />
+            <circle cx={p.x} cy={p.y} r="7" fill="currentColor" className="text-primary/15" />
+            <text x={p.x} y={padY - 4} textAnchor="middle" fontSize="10" fontWeight="700" fill="currentColor" className="text-on-surface dark:text-white">
+              {p.pct}%
+            </text>
+            <text x={p.x} y={height - 2} textAnchor="middle" fontSize="9" fill="currentColor" className="text-on-surface-variant dark:text-slate-400">
+              {p.name.length > 12 ? `${p.name.slice(0, 11)}…` : p.name}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 /* ─── Mobile grade card — replaces table rows on small/tablet screens ──── */
 function MobileGradeCard({ g, style, gc, pct, examName }) {
   return (
@@ -213,50 +285,108 @@ function MobileGradeCard({ g, style, gc, pct, examName }) {
   );
 }
 
+/* ─── No-permission state ───────────────────────────────────────────────── */
+function NoAcademicsAccess({ studentFirstName }) {
+  return (
+    <DashboardLayout>
+      <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto">
+        <div className="bg-surface-container-lowest dark:bg-slate-800/60 rounded-xl p-8 sm:p-12 text-center border border-outline-variant/10 dark:border-slate-700/40 shadow-sm">
+          <span className="material-symbols-outlined text-5xl text-on-surface-variant dark:text-slate-500">lock</span>
+          <h2 className="text-lg font-bold font-headline text-on-surface dark:text-white mt-4">
+            Academic access not enabled
+          </h2>
+          <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-2 max-w-md mx-auto">
+            Your account doesn't currently have permission to view {studentFirstName}&apos;s grades and report card.
+            Contact the school office to have academic access enabled for your profile.
+          </p>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+/* ─── Fetch-failed state — distinct from "legitimately no grades yet" ──── */
+function GradesFetchError({ studentFirstName, onRetry }) {
+  return (
+    <DashboardLayout>
+      <div className="p-3 sm:p-5 lg:p-8 max-w-7xl mx-auto">
+        <div className="bg-surface-container-lowest dark:bg-slate-800/60 rounded-xl p-8 sm:p-12 text-center border border-outline-variant/10 dark:border-slate-700/40 shadow-sm">
+          <span className="material-symbols-outlined text-5xl text-red-400">error</span>
+          <h2 className="text-lg font-bold font-headline text-on-surface dark:text-white mt-4">
+            Couldn't load {studentFirstName}&apos;s grades
+          </h2>
+          <p className="text-sm text-on-surface-variant dark:text-slate-400 mt-2 max-w-md mx-auto">
+            Something went wrong while fetching this report card. This is likely temporary — try again.
+          </p>
+          <button
+            onClick={onRetry}
+            className="mt-5 inline-flex items-center gap-2 bg-primary text-white px-4 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity"
+          >
+            <span className="material-symbols-outlined text-base">refresh</span>
+            Retry
+          </button>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}
+
 /* ─── Main Component ────────────────────────────────────────────────────── */
 export default function GradesAssessmentHub() {
-  const { profile, dashboard, enrollment, loading, error } = useParent();
+  const {
+    activeChild,
+    gradesFlat,
+    gradesExams,
+    gradesSummary,
+    gradesPermissionDenied,
+    gradesFetchFailed,
+    retryChildData,
+    enrollment,
+    loading,
+    childDataLoading,
+    error,
+  } = useParent();
   const [activeTab, setActiveTab] = useState("all");
 
-  /* ── Process grades from dashboard.grades ──
+  /* ── Process grades from gradesFlat (real /grades/ endpoint, already
+     flattened exam→subject by ParentProvider) ──
      Always recompute the letter grade from marks ourselves (never trust a
      possibly-missing g.grade field from the backend) so every subject —
      including Mathematics — gets a consistent grade + remarks fallback. */
   const allGrades = useMemo(() => {
-    const raw = dashboard?.grades?.results || dashboard?.grades || [];
-    if (!Array.isArray(raw)) return [];
-    return raw.map((g) => ({
+    if (!Array.isArray(gradesFlat)) return [];
+    return gradesFlat.map((g) => ({
       ...g,
-      subjectName: g.subject_name || g.subject?.name || "Unknown Subject",
+      subjectName: g.subject_name || "Unknown Subject",
       grade: scoreToGrade(g.marks_obtained, g.max_marks),
       remarks: g.remarks && g.remarks.trim() ? g.remarks : "No remarks provided.",
     }));
-  }, [dashboard]);
+  }, [gradesFlat]);
 
   /* ── Exam list for tab filter ── */
   const examOptions = useMemo(() => {
-    return [...new Set(allGrades.map((g) => g.exam_name || g.exam?.name).filter(Boolean))];
+    return [...new Set(allGrades.map((g) => g.exam_name).filter(Boolean))];
   }, [allGrades]);
 
   const filteredGrades = useMemo(() => {
     if (activeTab === "all") return allGrades;
-    return allGrades.filter((g) => (g.exam_name || g.exam?.name) === activeTab);
+    return allGrades.filter((g) => g.exam_name === activeTab);
   }, [allGrades, activeTab]);
 
-  /* ── Compute overall grade ── */
+  /* ── Compute overall grade — prefer the backend's overall_percentage
+     (gradesSummary) when present, since that's computed across ALL exams
+     server-side; fall back to averaging the loaded rows only if missing. ── */
   const overallStats = useMemo(() => {
     if (!allGrades.length) return { grade: "—", avgPct: 0 };
     const withScores = allGrades.filter((g) => g.marks_obtained != null && g.max_marks != null);
     if (!withScores.length) return { grade: "—", avgPct: 0 };
-    const totalPct = withScores.reduce(
-      (sum, g) => sum + (parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100,
-      0
-    );
-    const avgPct = totalPct / withScores.length;
+    const avgPct = gradesSummary?.overall_percentage != null
+      ? gradesSummary.overall_percentage
+      : withScores.reduce((sum, g) => sum + (parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100, 0) / withScores.length;
     const grade = scoreToGrade(avgPct, 100);
     const gpa = ((avgPct / 100) * 4).toFixed(1);
     return { grade, avgPct: Math.round(avgPct), gpa };
-  }, [allGrades]);
+  }, [allGrades, gradesSummary]);
 
   /* ── Best & weakest subject ── */
   const { best, weakest } = useMemo(() => {
@@ -268,9 +398,37 @@ export default function GradesAssessmentHub() {
     return { best: sorted[0], weakest: sorted[sorted.length - 1] };
   }, [allGrades]);
 
-  if (loading) return <GradesSkeleton />;
+  /* ── Performance trend: average score % per exam, chronological ──
+     Uses each subject's own `percentage` field when present, falling back
+     to marks_obtained/max_marks so a missing percentage doesn't drop a
+     subject from the average. ── */
+  const trendData = useMemo(() => {
+    if (!Array.isArray(gradesExams)) return [];
+    return gradesExams
+      .map((exam) => {
+        const subs = exam.subjects || [];
+        if (!subs.length) return null;
+        const total = subs.reduce((sum, s) => {
+          const pct = s.percentage != null
+            ? parseFloat(s.percentage)
+            : (parseFloat(s.marks_obtained) / parseFloat(s.max_marks)) * 100;
+          return sum + (isNaN(pct) ? 0 : pct);
+        }, 0);
+        return {
+          name: exam.exam_name || "Exam",
+          date: exam.exam_date,
+          pct: Math.round(total / subs.length),
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [gradesExams]);
 
-  if (error || !profile) {
+  // Initial dashboard load AND the per-child grades fetch both need the skeleton —
+  // otherwise switching children flashes empty/stale data for a beat.
+  if (loading || childDataLoading) return <GradesSkeleton />;
+
+  if (error || !activeChild) {
     return (
       <DashboardLayout>
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -282,8 +440,18 @@ export default function GradesAssessmentHub() {
     );
   }
 
-  const studentFirstName = profile?.first_name || "your child";
-  const studentFullName = `${profile?.first_name || ""} ${profile?.last_name || ""}`.trim() || studentFirstName;
+  // activeChild.name is a single full-name field from the dashboard API
+  // (no first_name/last_name split like the parent's own profile has).
+  const studentFullName = activeChild.name || "your child";
+  const studentFirstName = studentFullName.split(" ")[0] || studentFullName;
+
+  if (activeChild.can_view_academics === false || gradesPermissionDenied) {
+    return <NoAcademicsAccess studentFirstName={studentFirstName} />;
+  }
+
+  if (gradesFetchFailed) {
+    return <GradesFetchError studentFirstName={studentFirstName} onRetry={retryChildData} />;
+  }
 
   return (
     <DashboardLayout>
@@ -363,6 +531,8 @@ export default function GradesAssessmentHub() {
               </div>
             </div>
 
+            {allGrades.length > 0 && <PerformanceTrendChart data={trendData} />}
+
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-surface-container-low dark:bg-slate-700 px-4 py-3 rounded-xl">
                 <span className="block text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-wider mb-1">Best Subject</span>
@@ -431,7 +601,7 @@ export default function GradesAssessmentHub() {
                     const pct = g.marks_obtained != null && g.max_marks != null
                       ? Math.round((parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100)
                       : null;
-                    const examName = g.exam_name || g.exam?.name || "—";
+                    const examName = g.exam_name || "—";
                     return (
                       <MobileGradeCard
                         key={g.id || idx}
@@ -465,7 +635,7 @@ export default function GradesAssessmentHub() {
                         const pct = g.marks_obtained != null && g.max_marks != null
                           ? Math.round((parseFloat(g.marks_obtained) / parseFloat(g.max_marks)) * 100)
                           : null;
-                        const examName = g.exam_name || g.exam?.name || "—";
+                        const examName = g.exam_name || "—";
 
                         return (
                           <tr key={g.id || idx} className="hover:bg-surface-container-low/30 dark:hover:bg-slate-700/30 transition-colors">
