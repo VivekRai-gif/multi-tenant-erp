@@ -51,7 +51,7 @@ import CreateSubject from '../pages/schoolAdmin/CreateSubject';
 import CreateSection from '../pages/schoolAdmin/CreateSection';
 import SchoolAdminNotifications from "../pages/schoolAdmin/Notifications";
 
-/* ================= STUDENT ================= */
+/* STUDENT */
 import StudentDashboard from "../pages/student/Dashboard";
 import Notifications from "../pages/student/Notifications";
 import Assignments from "../pages/student/Assignments";
@@ -69,10 +69,11 @@ import Settings from "../pages/student/Settings";
 import Recommendations from "../pages/student/Recommendations";
 import AiTutor from "../pages/student/AiTutor";
 import GradesCard from "../pages/student/GradesCard";
-
-import { StudentProvider } from '../context/StudentProvider';
+import StudentTimetable from '../pages/student/StudentTimetable';
 import Grievance from "../pages/student/Grievance";
 import Circulars from "../pages/student/Circulars";
+
+import { StudentProvider } from '../context/StudentProvider';
 
 /* TEACHER PAGES */
 import MyClassesHub from "../pages/teacher/MyClassesHub";
@@ -347,6 +348,14 @@ function AppRoutes() {
           element={
             <StudentProvider>
               <GradesCard />
+            </StudentProvider>
+          }
+        />
+        <Route
+          path="/student/timetable"
+          element={
+            <StudentProvider>
+              <StudentTimetable />
             </StudentProvider>
           }
         />
