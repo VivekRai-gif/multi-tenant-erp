@@ -147,7 +147,6 @@ function ResultList({ grouped, activeIndex, onSelect, onHover }) {
           })}
         </div>
       ))}
-      
     </>
   );
 }
@@ -250,10 +249,8 @@ function MobileSearchOverlay({ onClose, searchIndex }) {
   const { query, setQuery, grouped, activeIndex, setActiveIndex, handleSelect, handleKeyDown } =
     useSearchLogic(searchIndex, onClose);
 
-  // Auto-focus input when overlay opens
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 50); }, []);
 
-  // Lock body scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
@@ -307,7 +304,7 @@ function MobileSearchOverlay({ onClose, searchIndex }) {
 }
 
 // ─── TopNavbar ─────────────────────────────────────────────────────────────────
-export default function TopNavbar({ title }) {
+export default function TopNavbar({ title, headerActions }) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchIndex = useSearchIndex();
 
@@ -315,13 +312,30 @@ export default function TopNavbar({ title }) {
     <>
       <header className="sticky top-0 z-40 bg-surface-container-low/90 backdrop-blur-md border-b border-outline-variant/30 transition-colors duration-300">
         <div className="flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4">
-          {/* Title */}
+          {/*
+            pl-12 reserves space for Sidebar's floating hamburger button
+            (fixed top-4 left-4), which renders whenever the sidebar is in
+            overlay mode. That mode now applies below 1280px (matches the
+            threshold in Sidebar.jsx / MainLayout.jsx), so the padding must
+            only drop away at xl, not md — otherwise on iPad widths the
+            floating button overlaps the title text.
+          */}
           <div className="flex items-center gap-4 pl-12 xl:pl-0">
-            <h1 className="text-lg sm:text-xl font-bold font-headline text-on-background tracking-tight">{title}</h1>
+            <h1 className="text-lg sm:text-xl font-bold font-headline text-on-background tracking-tight">
+              {title}
+            </h1>
           </div>
 
           {/* Right actions */}
           <div className="flex items-center gap-1 sm:gap-3">
+
+            {/* ── Extra actions injected by the page (e.g. ID Card button) ── */}
+            {headerActions && (
+              <div className="flex items-center gap-2">
+                {headerActions}
+              </div>
+            )}
+
             {/* Desktop search */}
             <div className="hidden lg:block">
               <DesktopSearchBar searchIndex={searchIndex} />
