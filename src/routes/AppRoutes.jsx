@@ -69,6 +69,7 @@ import Settings from "../pages/student/Settings";
 import Recommendations from "../pages/student/Recommendations";
 import AiTutor from "../pages/student/AiTutor";
 import GradesCard from "../pages/student/GradesCard";
+import Circulars from "../pages/student/Circulars";
 import { StudentProvider } from '../context/StudentProvider';
 import StudentTimetable from '../pages/student/StudentTimetable';
 
@@ -347,6 +348,7 @@ function AppRoutes() {
             </StudentProvider>
           }
         />
+<<<<<<< HEAD
          <Route
   path="/student/timetable"
   element={
@@ -355,6 +357,16 @@ function AppRoutes() {
     </StudentProvider>
   }
 />
+=======
+        <Route
+          path="/student/circulars"
+          element={
+            <StudentProvider>
+              <Circulars />
+            </StudentProvider>
+          }
+        />
+>>>>>>> upstream/main
 
         {/* ================= TEACHER ================= */}
         <Route path="/teacher" element={<Navigate to="/teacher/dashboard" />} />
