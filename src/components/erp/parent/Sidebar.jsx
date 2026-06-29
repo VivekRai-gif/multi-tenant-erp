@@ -1,5 +1,3 @@
-// src/components/erp/parent/Sidebar.jsx
-
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -46,14 +44,15 @@ export default function Sidebar({ isExpanded, isMobile, onToggle, onClose }) {
   };
 
   const navItems = [
-    { to: "/parent", end: true, icon: "dashboard", label: "Dashboard" },
-    { to: "/parent/child-overview", end: false, icon: "child_care", label: "Child Overview" },
-    { to: "/parent/attendance", end: false, icon: "calendar_today", label: "Attendance" },
-    { to: "/parent/assignments", end: false, icon: "assignment", label: "Assignments" },
-    { to: "/parent/grades", end: false, icon: "assessment", label: "Grades & Report" },
-    { to: "/parent/insights", end: false, icon: "psychology", label: "AI Insights" },
-    { to: "/parent/grievance", end: false, icon: "gavel", label: "Grievance" }, // ← added
-  ];
+    { to: "/parent",                end: true,  icon: "dashboard",      label: "Dashboard"       },
+    { to: "/parent/child-overview", end: false, icon: "child_care",     label: "Child Overview"  },
+    { to: "/parent/attendance",     end: false, icon: "calendar_today", label: "Attendance"      },
+    { to: "/parent/assignments",    end: false, icon: "assignment",     label: "Assignments"     },
+    { to: "/parent/grades",         end: false, icon: "assessment",     label: "Grades & Report" },
+    { to: "/parent/circulars",      end: false, icon: "campaign",       label: "Circulars"       }, // From main
+    { to: "/parent/ai-insights",    end: false, icon: "psychology",     label: "AI Insights"     }, // From main
+    { to: "/parent/grievance",      end: false, icon: "gavel",          label: "Grievance"       }, // From your branch
+];
 
   const navClass = ({ isActive }) =>
     `flex items-center rounded-xl transition-all duration-200 font-semibold text-sm flex-shrink-0
