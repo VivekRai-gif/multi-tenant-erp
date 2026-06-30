@@ -13,7 +13,6 @@ const navItems = [
   { icon: 'calendar_month', label: 'Timetable', path: '/student/timetable' },
   { icon: 'psychology', label: 'AI Tutor', path: '/student/ai-tutor' },
   { icon: 'gavel', label: 'Grievance', path: '/student/grievance' },
-  { icon: 'campaign', label: 'Circulars', path: '/student/circulars' },
   { icon: 'account_balance_wallet', label: 'Fees', path: '/student/fees' },
   { icon: 'support_agent', label: 'Help Desk', path: '/student/help' },
 ];
